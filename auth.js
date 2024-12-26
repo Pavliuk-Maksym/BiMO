@@ -38,7 +38,7 @@
         )
       )
       .then(() => createSharedFolder(user.name))
-      .catch(alert(onError));
+      .catch(onError);
   }
 
   function createSharedFolder(name) {
@@ -78,8 +78,8 @@
     const name = document.getElementById("forgot-password-name").value;
 
     Backendless.UserService.restorePassword(name)
-      .then(() => showInfo("Password reset instructions sent to your email."))
-      .catch(alert(onError));
+      .then(showInfo("Password reset instructions sent to your email."))
+      .catch(onError);
   }
 
   function validateUser(user) {

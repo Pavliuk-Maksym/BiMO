@@ -33,12 +33,12 @@
 
     Backendless.UserService.register(user)
       .then(() =>
-        alert(
+        showInfo(
           "User registered successfully. Please check your email to confirm registration."
         )
       )
       .then(() => createSharedFolder(user.name))
-      .catch((error) => alert("Error: " + error.message));
+      .catch(alert(onError));
   }
 
   function createSharedFolder(name) {
@@ -78,8 +78,8 @@
     const name = document.getElementById("forgot-password-name").value;
 
     Backendless.UserService.restorePassword(name)
-      .then(() => alert("Password reset instructions sent to your email."))
-      .catch((error) => alert("Error: " + error.message));
+      .then(() => showInfo("Password reset instructions sent to your email."))
+      .catch(alert(onError));
   }
 
   function validateUser(user) {
@@ -104,11 +104,15 @@
 
   function showInfo(text) {
     const messageElement = document.getElementById("message");
+    if (!messageElement) {
+      console.error("Message element not found");
+      return;
+    }
     messageElement.textContent = text;
     messageElement.classList.add("visible");
 
     setTimeout(() => {
       messageElement.classList.remove("visible");
-    }, 6000);
+    }, 5000);
   }
 })(Backendless);

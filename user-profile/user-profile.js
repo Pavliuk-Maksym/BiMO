@@ -16,6 +16,7 @@
   initEventHandlers();
 
   function initEventHandlers() {
+    document.getElementById("logout-btn")?.addEventListener("click", logout);
     document
       .getElementById("update-profile-btn")
       .addEventListener("click", updateProfile);
@@ -43,6 +44,9 @@
     document
       .getElementById("save-avatar-btn")
       .addEventListener("click", saveSelectedAvatar);
+    document.getElementById("close-modal-btn").addEventListener("click", () => {
+      document.getElementById("avatar-selection-modal").style.display = "none";
+    });
   }
 
   function initCurrentUser() {
@@ -563,7 +567,7 @@
         var imageFiles = files.filter((file) =>
           file.name.match(/\.(jpg|jpeg|png|gif)$/i)
         );
-        var modalBody = document.getElementById("avatar-selection-modal-body");
+        var modalBody = document.getElementById("avatar-selection-modal");
         if (imageFiles.length) {
           modalBody.innerHTML = imageFiles
             .map((file) => {
@@ -616,6 +620,15 @@
   function updateAvatarDisplay() {
     var avatarUrl = currentUser.profilePhoto || "/placeholder-avatar.png";
     document.getElementById("profile-avatar").src = avatarUrl;
+  }
+
+  function logout() {
+    Backendless.UserService.logout()
+      .then(() => {
+        currentUser = null;
+        window.location.href = "../auth/auth.html";
+      })
+      .catch(onError);
   }
 
   function onError(error) {

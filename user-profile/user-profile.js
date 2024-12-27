@@ -1,7 +1,7 @@
 (function (Backendless) {
-  const APPLICATION_ID = "10C03549-73C1-476B-8D8F-C9313DDD8D00";
-  const SECRET_KEY = "44C48D58-78FF-4558-8489-9979881887E4";
-  let currentUser = null;
+  var APPLICATION_ID = "10C03549-73C1-476B-8D8F-C9313DDD8D00";
+  var SECRET_KEY = "44C48D58-78FF-4558-8489-9979881887E4";
+  // let currentUser = null;
 
   if (!APPLICATION_ID || !SECRET_KEY) {
     alert(
@@ -52,8 +52,16 @@
           alert("Please login first");
           return;
         }
+
         currentUser = user;
+
+        if (currentUser.profilePhoto) {
+          document.getElementById("profile-avatar").src =
+            currentUser.profilePhoto;
+        }
+
         console.log("Current user:", currentUser);
+        console.log("Current user photo:", currentUser.profilePhoto);
       })
       .catch((error) => {
         alert("Error retrieving current user");
@@ -63,14 +71,14 @@
 
   function initProfilePhotoHandlers() {
     // Обработчик для кнопки загрузки нового фото
-    const updateProfilePhotoBtn = document.getElementById(
+    var updateProfilePhotoBtn = document.getElementById(
       "update-profile-photo-btn"
     );
-    const profilePhotoInput = document.getElementById("profile-photo-input");
-    const chooseExistingPhotoBtn = document.getElementById(
+    var profilePhotoInput = document.getElementById("profile-photo-input");
+    var chooseExistingPhotoBtn = document.getElementById(
       "choose-existing-photo-btn"
     );
-    const saveAvatarBtn = document.getElementById("save-avatar-btn");
+    var saveAvatarBtn = document.getElementById("save-avatar-btn");
 
     // Обработчик для кнопки загрузки нового фото
     updateProfilePhotoBtn.addEventListener("click", function () {
@@ -96,11 +104,11 @@
     oldUserName = currentUser.name;
 
     // Get values from input fields
-    const name = document.getElementById("profile-name").value;
-    const email = document.getElementById("profile-email").value;
-    const age = document.getElementById("profile-age").value;
-    const gender = document.getElementById("profile-gender").value;
-    const country = document.getElementById("profile-country").value;
+    var name = document.getElementById("profile-name").value;
+    var email = document.getElementById("profile-email").value;
+    var age = document.getElementById("profile-age").value;
+    var gender = document.getElementById("profile-gender").value;
+    var country = document.getElementById("profile-country").value;
 
     // Update currentUser object
     currentUser.name = name;
@@ -134,7 +142,7 @@
       trackingInterval = setInterval(() => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            const { latitude, longitude } = position.coords;
+            var { latitude, longitude } = position.coords;
             currentUser["my location"] = {
               type: "Point",
               coordinates: [longitude, latitude],
@@ -161,13 +169,11 @@
       return;
     }
 
-    const latitude = parseFloat(
-      document.getElementById("place-latitude").value
-    );
-    const longitude = parseFloat(
+    var latitude = parseFloat(document.getElementById("place-latitude").value);
+    var longitude = parseFloat(
       document.getElementById("place-longitude").value
     );
-    const place = {
+    var place = {
       category: document.getElementById("place-category").value,
       description: document.getElementById("place-description").value,
       hashtags: document
@@ -193,7 +199,7 @@
       return;
     }
 
-    const placeName = document.getElementById("place-to-delete").value;
+    var placeName = document.getElementById("place-to-delete").value;
 
     // Теперь значение name обернуто в кавычки
     Backendless.Data.of("Place")
@@ -214,22 +220,20 @@
   }
 
   function searchPlaces() {
-    const searchQuery = document.getElementById("place-search-name").value;
-    const searchCategory = document.getElementById(
-      "place-search-category"
-    ).value;
-    const radius = parseFloat(document.getElementById("search-radius").value);
+    var searchQuery = document.getElementById("place-search-name").value;
+    var searchCategory = document.getElementById("place-search-category").value;
+    var radius = parseFloat(document.getElementById("search-radius").value);
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+        var latitude = position.coords.latitude;
+        var longitude = position.coords.longitude;
 
-        const whereClauses = [];
+        var whereClauses = [];
         if (searchQuery) whereClauses.push(`name LIKE '%${searchQuery}%'`); // Поиск по названию
         if (searchCategory) whereClauses.push(`category = '${searchCategory}'`);
 
-        const queryBuilder = Backendless.DataQueryBuilder.create();
+        var queryBuilder = Backendless.DataQueryBuilder.create();
         queryBuilder.setWhereClause(whereClauses.join(" AND "));
         queryBuilder.setProperties([
           "objectId",
@@ -244,15 +248,15 @@
         Backendless.Data.of("Place")
           .find(queryBuilder)
           .then((places) => {
-            const resultsContainer = document.getElementById("search-results");
+            var resultsContainer = document.getElementById("search-results");
             if (places.length > 0) {
               resultsContainer.innerHTML = places
                 .map((place) => {
                   // Извлекаем координаты из объекта location
-                  const location = place.location && place.location.coordinates;
+                  var location = place.location && place.location.coordinates;
 
                   // Если координаты существуют, форматируем их
-                  const locationText =
+                  var locationText =
                     location && location.length === 2
                       ? `${latitude}, ${longitude}` // longitude, latitude
                       : "Not available";
@@ -284,23 +288,23 @@
   }
 
   //   function searchPlaces() {
-  //     const searchQuery = document.getElementById("place-search-name").value;
-  //     const searchCategory = document.getElementById(
+  //     var searchQuery = document.getElementById("place-search-name").value;
+  //     var searchCategory = document.getElementById(
   //       "place-search-category"
   //     ).value;
-  //     const radius = parseFloat(document.getElementById("search-radius").value);
+  //     var radius = parseFloat(document.getElementById("search-radius").value);
 
   //     navigator.geolocation.getCurrentPosition(
   //       (position) => {
-  //         const latitude = position.coords.latitude;
-  //         const longitude = position.coords.longitude;
+  //         var latitude = position.coords.latitude;
+  //         var longitude = position.coords.longitude;
 
-  //         const whereClauses = [];
+  //         var whereClauses = [];
   //         if (searchQuery)
   //           whereClauses.push(`description LIKE '%${searchQuery}%'`);
   //         if (searchCategory) whereClauses.push(`category = '${searchCategory}'`);
 
-  //         const queryBuilder = Backendless.DataQueryBuilder.create();
+  //         var queryBuilder = Backendless.DataQueryBuilder.create();
   //         queryBuilder.setWhereClause(whereClauses.join(" AND "));
   //         queryBuilder.setProperties([
   //           "objectId",
@@ -314,7 +318,7 @@
   //         Backendless.Data.of("Place")
   //           .find(queryBuilder)
   //           .then((places) => {
-  //             const resultsContainer = document.getElementById("search-results");
+  //             var resultsContainer = document.getElementById("search-results");
   //             if (places.length > 0) {
   //               resultsContainer.innerHTML = places
   //                 .map(
@@ -352,7 +356,7 @@
       return;
     }
 
-    const placeName = document.getElementById("place-to-like").value;
+    var placeName = document.getElementById("place-to-like").value;
 
     Backendless.Data.of("Place")
       .findFirst({ where: `name = '${placeName}'` })
@@ -372,7 +376,7 @@
               return Promise.reject();
             }
             // Save the like
-            const like = {
+            var like = {
               placeId: place.objectId,
               userId: currentUser.objectId,
             };
@@ -389,13 +393,13 @@
       return;
     }
 
-    const placeName = document.getElementById("place-to-view").value;
+    var placeName = document.getElementById("place-to-view").value;
 
     Backendless.Data.of("Place")
       .findFirst({ where: `name = '${placeName}'` })
       .then((place) => {
         if (place) {
-          const coordinates = place.location?.coordinates;
+          var coordinates = place.location?.coordinates;
           if (coordinates) {
             // Display map with place's location
             showInfo(
@@ -415,7 +419,7 @@
   }
 
   function saveSelectedPhoto() {
-    const selectedPhotoInput = document.querySelector(
+    var selectedPhotoInput = document.querySelector(
       'input[name="selected_photo"]:checked'
     );
     if (!selectedPhotoInput) {
@@ -423,7 +427,7 @@
       return;
     }
 
-    const selectedPhotoUrl = selectedPhotoInput.value;
+    var selectedPhotoUrl = selectedPhotoInput.value;
 
     Backendless.UserService.update({
       objectId: currentUser.objectId,
@@ -454,29 +458,33 @@
       return;
     }
 
-    const path = `users/${currentUser.objectId}/photos/`;
+    console.log("Showing existing photos for user:", currentUser);
+
+    var path = `users/${currentUser.objectId}/photos/`;
 
     Backendless.Files.listing(path, "*", true) // Загружаем все файлы из директории
       .then((files) => {
-        const imageFiles = files.filter((file) =>
-          file.name.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/)
+        var imageFiles = files.filter((file) =>
+          file.name.toLowerCase().match(/\.(jpg|jpeg|png)$/)
         );
 
-        const modalBody = document.querySelector(
+        filesUrls = imageFiles.map((file) => file.publicUrl);
+
+        var modalBody = document.querySelector(
           "#avatar-selection-modal .modal-body"
         );
 
         if (imageFiles.length === 0) {
           showInfo("No photos found. Please upload some photos first.");
         } else {
-          const photosHtml = imageFiles
+          var photosHtml = imageFiles
             .map(
               (file) => `
             <div class="col-4 mb-3">
               <div class="card">
-                <img src="${file.fileURL}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                <img src="${file.publicUrl}" class="card-img-top" style="height: 150px; object-fit: cover;">
                 <div class="card-body text-center">
-                  <input type="radio" name="selected_photo" value="${file.fileURL}" class="form-check-input">
+                  <input type="radio" name="selected_photo" value="${file.publicUrl}" class="form-check-input">
                 </div>
               </div>
             </div>
@@ -503,7 +511,7 @@
       return;
     }
 
-    const file = event.target.files[0];
+    var file = event.target.files[0];
     if (!file) return;
 
     // Проверка типа файла
@@ -515,7 +523,7 @@
     showInfo("Uploading profile photo...");
 
     // Создаем уникальный путь для файла
-    const photoPath = `users/${currentUser.objectId}/photos/${Date.now()}_${
+    var photoPath = `users/${currentUser.objectId}/photos/${Date.now()}_${
       file.name
     }`;
 
@@ -549,15 +557,13 @@
       return;
     }
 
-    const path = `users/${currentUser.objectId}/profile-photos`;
+    var path = `users/${currentUser.objectId}/profile-photos`;
     Backendless.Files.listing(path)
       .then((files) => {
-        const imageFiles = files.filter((file) =>
+        var imageFiles = files.filter((file) =>
           file.name.match(/\.(jpg|jpeg|png|gif)$/i)
         );
-        const modalBody = document.getElementById(
-          "avatar-selection-modal-body"
-        );
+        var modalBody = document.getElementById("avatar-selection-modal-body");
         if (imageFiles.length) {
           modalBody.innerHTML = imageFiles
             .map((file) => {
@@ -585,7 +591,7 @@
   }
 
   function saveSelectedAvatar() {
-    const selectedPhoto = document.querySelector(
+    var selectedPhoto = document.querySelector(
       'input[name="avatar"]:checked'
     )?.value;
     if (!selectedPhoto) {
@@ -608,7 +614,7 @@
   }
 
   function updateAvatarDisplay() {
-    const avatarUrl = currentUser.profilePhoto || "/placeholder-avatar.png";
+    var avatarUrl = currentUser.profilePhoto || "/placeholder-avatar.png";
     document.getElementById("profile-avatar").src = avatarUrl;
   }
 
@@ -618,7 +624,7 @@
   }
 
   function showInfo(text) {
-    const messageElement = document.getElementById("message");
+    var messageElement = document.getElementById("message");
     if (!messageElement) {
       console.error("Message element not found");
       return;

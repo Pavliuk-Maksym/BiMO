@@ -71,7 +71,7 @@ button:hover {
 }
 
 #message.visible {
-  display: block; /* Элемент становится видимым */
+  display: block;
   opacity: 1;
 }
 
@@ -98,4 +98,84 @@ button:hover {
 #logout-btn:disabled {
   background: #333;
   cursor: not-allowed;
+}
+
+.navigation {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-bottom: 2px solid #ccc;
+}
+
+.navigation button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.navigation button:hover {
+  background-color: #0056b3;
+}
+
+#profile-section {
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#user-profile-app {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#avatar-selection-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: none; /* По умолчанию скрыто */
+}
+
+#avatar-selection-modal .modal-body {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+#avatar-selection-modal .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+#avatar-selection-modal .col-4 {
+  flex: 0 0 30%;
+}
+
+#avatar-selection-modal img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+#avatar-selection-modal .form-check-input {
+  margin-top: 10px;
+}
+
+#avatar-selection-modal button {
+  margin-top: 10px;
 }

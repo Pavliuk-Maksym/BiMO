@@ -221,7 +221,7 @@
     Backendless.UserService.logout()
       .then(() => {
         currentUser = null;
-        window.location.href = "index.html";
+        window.location.href = "../auth/auth.html";
       })
       .catch(onError);
   }

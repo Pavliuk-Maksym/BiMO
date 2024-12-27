@@ -60,7 +60,7 @@
         if (user) {
           showInfo("Login successful");
           setTimeout(() => {
-            window.location.href = "dashboard.html";
+            window.location.href = "../file-management/file-management.html";
           }, 1000);
         } else {
           showInfo("Login failed");

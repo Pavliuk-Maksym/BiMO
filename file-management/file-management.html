@@ -4,10 +4,20 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>File Management Dashboard</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="../styles.css" />
     <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
   </head>
   <body>
+    <header id="header">
+      <script>
+        fetch("../header.html")
+          .then((response) => response.text())
+          .then((html) => {
+            document.getElementById("header").innerHTML = html;
+          })
+          .catch((error) => console.error("Error loading header:", error));
+      </script>
+    </header>
     <div id="file-app">
       <h1>File Management</h1>
       <div id="message" class="info-message"></div>

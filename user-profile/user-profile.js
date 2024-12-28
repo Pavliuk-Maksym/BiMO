@@ -1,7 +1,6 @@
 (function (Backendless) {
   var APPLICATION_ID = "10C03549-73C1-476B-8D8F-C9313DDD8D00";
   var SECRET_KEY = "44C48D58-78FF-4558-8489-9979881887E4";
-  // let currentUser = null;
 
   if (!APPLICATION_ID || !SECRET_KEY) {
     alert(
@@ -74,7 +73,6 @@
   }
 
   function initProfilePhotoHandlers() {
-    // Обработчик для кнопки загрузки нового фото
     var updateProfilePhotoBtn = document.getElementById(
       "update-profile-photo-btn"
     );
@@ -84,18 +82,14 @@
     );
     var saveAvatarBtn = document.getElementById("save-avatar-btn");
 
-    // Обработчик для кнопки загрузки нового фото
     updateProfilePhotoBtn.addEventListener("click", function () {
       profilePhotoInput.click();
     });
 
-    // Обработчик изменения файла
     profilePhotoInput.addEventListener("change", handleProfilePhotoUpload);
 
-    // Обработчик для выбора существующего фото
     chooseExistingPhotoBtn.addEventListener("click", showExistingPhotos);
 
-    // Обработчик сохранения выбранного фото
     saveAvatarBtn.addEventListener("click", saveSelectedPhoto);
   }
 
@@ -107,21 +101,18 @@
 
     oldUserName = currentUser.name;
 
-    // Get values from input fields
     var name = document.getElementById("profile-name").value;
     var email = document.getElementById("profile-email").value;
     var age = document.getElementById("profile-age").value;
     var gender = document.getElementById("profile-gender").value;
     var country = document.getElementById("profile-country").value;
 
-    // Update currentUser object
     currentUser.name = name;
     currentUser.email = email;
     currentUser.age = Number(age);
     currentUser.gender = gender;
     currentUser.country = country;
 
-    // Update user in Backendless
     Backendless.UserService.update(currentUser)
       .then((updatedUser) => {
         currentUser = updatedUser;
@@ -163,7 +154,7 @@
           (error) => console.error("Geolocation error:", error),
           { enableHighAccuracy: true }
         );
-      }, 60000); // 60 seconds interval
+      }, 60000);
     }
   }
 
@@ -205,10 +196,9 @@
 
     var placeName = document.getElementById("place-to-delete").value;
 
-    // Теперь значение name обернуто в кавычки
     Backendless.Data.of("Place")
       .findFirst({
-        where: `name = '${placeName}' AND ownerId = '${currentUser.objectId}'`, // value wrapped in single quotes
+        where: `name = '${placeName}' AND ownerId = '${currentUser.objectId}'`,
       })
       .then((place) => {
         if (place) {
@@ -311,7 +301,7 @@
           showInfo("Place not found.");
           return Promise.reject();
         }
-        // Check if user has already liked the place
+
         return Backendless.Data.of("Place_Likes")
           .findFirst({
             where: `placeId = '${place.objectId}' AND userId = '${currentUser.objectId}'`,
@@ -321,7 +311,7 @@
               showInfo("You have already liked this place.");
               return Promise.reject();
             }
-            // Save the like
+
             var like = {
               placeId: place.objectId,
               userId: currentUser.objectId,
@@ -352,6 +342,7 @@
       })
       .catch(onError);
   }
+
   function viewPlaceOnMap() {
     if (!currentUser) {
       showInfo("Please login first");
@@ -363,60 +354,28 @@
     Backendless.Data.of("Place")
       .findFirst({ where: `name = '${placeName}'` })
       .then((place) => {
-        if (place) {
-          var location = [place.location.x, place.location.y];
-          var locationText =
-            location && location.length === 2
-              ? `${location[0]}, ${location[1]}`
-              : "Not available";
+        var latitude = place.location.y;
+        var longitude = place.location.x;
 
-          var placeInfo = `
-            <div>
-              <strong>${place.name}</strong>
-              Location: ${locationText}
-            </div><hr>
-          `;
+        var zoomLevel = 12;
 
-          var resultsContainer = document.getElementById("place-info");
-          resultsContainer.innerHTML = placeInfo;
+        var mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=${zoomLevel}&output=embed`;
 
-          // Additional logic to display map can be implemented here
-        } else {
-          showInfo("Place not found.");
-        }
+        const viewPlace = document.getElementById("view-place-on-map-btn");
+        var mapContainer = document.getElementById("map-container");
+
+        var iframe = document.createElement("iframe");
+        iframe.src = mapUrl;
+        iframe.loading = "lazy";
+        iframe.allowFullscreen = true;
+
+        mapContainer.appendChild(iframe);
+        mapContainer.style.display = "block";
+
+        viewPlace.disabled = true;
       })
       .catch(onError);
   }
-  // function viewPlaceOnMap() {
-  //   if (!currentUser) {
-  //     showInfo("Please login first");
-  //     return;
-  //   }
-
-  //   var placeName = document.getElementById("place-to-view").value;
-
-  //   Backendless.Data.of("Place")
-  //     .findFirst({ where: `name = '${placeName}'` })
-  //     .then((place) => {
-  //       if (place) {
-  //         var coordinates = [place.location.x, place.location.y];
-  //         if (coordinates) {
-  //           // Display map with place's location
-  //           showInfo(
-  //             `Showing place on map: ${
-  //               place.name
-  //             }. Coordinates: ${coordinates.join(", ")}`
-  //           );
-  //           // Additional logic to display map can be implemented here
-  //         } else {
-  //           showInfo("Location not available for this place.");
-  //         }
-  //       } else {
-  //         showInfo("Place not found.");
-  //       }
-  //     })
-  //     .catch(onError);
-  // }
 
   function saveSelectedPhoto() {
     var selectedPhotoInput = document.querySelector(
@@ -436,11 +395,9 @@
       .then((updatedUser) => {
         currentUser = updatedUser;
 
-        // Обновляем аватар в интерфейсе
         document.getElementById("profile-avatar").src =
           currentUser.profilePhoto;
 
-        // Закрываем модальное окно
         document.getElementById("avatar-selection-modal").style.display =
           "none";
 
@@ -462,7 +419,7 @@
 
     var path = `users/${currentUser.objectId}/photos/`;
 
-    Backendless.Files.listing(path, "*", true) // Загружаем все файлы из директории
+    Backendless.Files.listing(path, "*", true)
       .then((files) => {
         var imageFiles = files.filter((file) =>
           file.name.toLowerCase().match(/\.(jpg|jpeg|png)$/)
@@ -495,7 +452,6 @@
           modalBody.innerHTML = `<div class="row">${photosHtml}</div>`;
         }
 
-        // Показываем модальное окно
         document.getElementById("avatar-selection-modal").style.display =
           "block";
       })
@@ -514,7 +470,6 @@
     var file = event.target.files[0];
     if (!file) return;
 
-    // Проверка типа файла
     if (!file.type.startsWith("image/")) {
       showInfo("Please select a valid image file.");
       return;
@@ -522,15 +477,12 @@
 
     showInfo("Uploading profile photo...");
 
-    // Создаем уникальный путь для файла
     var photoPath = `users/${currentUser.objectId}/photos/${Date.now()}_${
       file.name
     }`;
 
-    // Загружаем файл
     Backendless.Files.upload(file, photoPath, true)
       .then((uploadedFile) => {
-        // Обновляем профиль пользователя с новым URL фото
         return Backendless.UserService.update({
           objectId: currentUser.objectId,
           profilePhoto: uploadedFile.fileURL,
@@ -539,7 +491,6 @@
       .then((updatedUser) => {
         currentUser = updatedUser;
 
-        // Обновляем аватар в интерфейсе
         document.getElementById("profile-avatar").src =
           currentUser.profilePhoto;
 

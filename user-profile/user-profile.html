@@ -8,7 +8,6 @@
     <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
   </head>
   <body>
-    <!-- Header -->
     <header id="header">
       <script>
         fetch("../header.html")
@@ -20,12 +19,10 @@
       </script>
     </header>
 
-    <!-- Main Content -->
     <main id="user-profile-app">
       <h1>User Profile</h1>
       <div id="message" class="info-message"></div>
 
-      <!-- Profile Information -->
       <section id="profile-section">
         <h2>Update Profile</h2>
         <div>
@@ -55,7 +52,6 @@
         <button id="update-profile-btn">Update Profile</button>
       </section>
 
-      <!-- Location Tracking -->
       <section id="location-tracking-section">
         <h2>Location Tracking</h2>
         <button id="toggle-location-tracking-btn">
@@ -63,7 +59,6 @@
         </button>
       </section>
 
-      <!-- Places Management -->
       <section id="places-section">
         <h2>Manage Places</h2>
         <div>
@@ -103,7 +98,6 @@
         </div>
       </section>
 
-      <!-- Like and View Place -->
       <section id="place-actions-section">
         <h2>Place Actions</h2>
         <div>
@@ -117,13 +111,10 @@
           <label for="place-to-view">Place Name:</label>
           <input type="text" id="place-to-view" />
           <button id="view-place-on-map-btn">View Place</button>
-          <div id="place-info">
-            <!-- Content will be dynamically added here -->
-          </div>
+          <div id="map-container"></div>
         </div>
       </section>
 
-      <!-- Profile Photo -->
       <section id="profile-photo-section">
         <h2>Profile Photo</h2>
         <div>
@@ -140,14 +131,10 @@
           <button id="choose-existing-photo-btn">Choose Existing Photo</button>
         </div>
 
-        <!-- Modal for selecting existing photo -->
         <div id="avatar-selection-modal" style="display: none">
-          <!-- <div class="modal-overlay"></div> -->
           <div class="modal-content">
             <h3>Select a Profile Photo</h3>
-            <div class="modal-body">
-              <!-- Content will be dynamically added here -->
-            </div>
+            <div class="modal-body"></div>
             <div class="modal-footer">
               <button id="save-avatar-btn">Save Selected Avatar</button>
               <button id="close-modal-btn">Close</button>

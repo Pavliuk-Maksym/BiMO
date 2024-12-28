@@ -233,18 +233,25 @@
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
 
+        console.log("position", position);
+        console.log("coords", position.coords);
+        console.log("latitude cords", position.coords.latitude);
+        console.log("longitude cords", position.coords.longitude);
+        console.log("latitude", latitude);
+        console.log("longitude", longitude);
+
         var whereClauses = [];
-        if (searchQuery) whereClauses.push(`name LIKE '%${searchQuery}%'`); // Поиск по названию
+        if (searchQuery) whereClauses.push(`name LIKE '%${searchQuery}%'`);
         if (searchCategory) whereClauses.push(`category = '${searchCategory}'`);
 
         var queryBuilder = Backendless.DataQueryBuilder.create();
         queryBuilder.setWhereClause(whereClauses.join(" AND "));
         queryBuilder.setProperties([
           "objectId",
-          "name", // Добавляем поле "name" для отображения в результатах
+          "name",
           "category",
           "description",
-          "location", // Обрабатываем поле location
+          "location",
           "hashtags",
         ]);
         queryBuilder.setPageSize(20);
@@ -256,18 +263,16 @@
             if (places.length > 0) {
               resultsContainer.innerHTML = places
                 .map((place) => {
-                  // Извлекаем координаты из объекта location
-                  var location = place.location && place.location.coordinates;
+                  var location = [place.location.x, place.location.y];
 
-                  // Если координаты существуют, форматируем их
                   var locationText =
                     location && location.length === 2
-                      ? `${latitude}, ${longitude}` // longitude, latitude
+                      ? `${location[0]}, ${location[1]}`
                       : "Not available";
 
                   return `
                     <div>
-                      <strong>${place.name}</strong><br> <!-- Отображаем название места -->
+                      <strong>${place.name}</strong><br>
                       Category: ${place.category}<br>
                       Hashtags: ${place.hashtags}<br>
                       Location: ${locationText}
@@ -290,69 +295,6 @@
       }
     );
   }
-
-  //   function searchPlaces() {
-  //     var searchQuery = document.getElementById("place-search-name").value;
-  //     var searchCategory = document.getElementById(
-  //       "place-search-category"
-  //     ).value;
-  //     var radius = parseFloat(document.getElementById("search-radius").value);
-
-  //     navigator.geolocation.getCurrentPosition(
-  //       (position) => {
-  //         var latitude = position.coords.latitude;
-  //         var longitude = position.coords.longitude;
-
-  //         var whereClauses = [];
-  //         if (searchQuery)
-  //           whereClauses.push(`description LIKE '%${searchQuery}%'`);
-  //         if (searchCategory) whereClauses.push(`category = '${searchCategory}'`);
-
-  //         var queryBuilder = Backendless.DataQueryBuilder.create();
-  //         queryBuilder.setWhereClause(whereClauses.join(" AND "));
-  //         queryBuilder.setProperties([
-  //           "objectId",
-  //           "category",
-  //           "description",
-  //           "location",
-  //           "hashtags",
-  //         ]);
-  //         queryBuilder.setPageSize(20);
-
-  //         Backendless.Data.of("Place")
-  //           .find(queryBuilder)
-  //           .then((places) => {
-  //             var resultsContainer = document.getElementById("search-results");
-  //             if (places.length > 0) {
-  //               resultsContainer.innerHTML = places
-  //                 .map(
-  //                   (place) => `
-  //                 <div>
-  //                   <strong>${place.description}</strong><br>
-  //                   Category: ${place.category}<br>
-  //                   Hashtags: ${place.hashtags}<br>
-  //                   Location: ${
-  //                     place.location?.coordinates.join(", ") || "Not available"
-  //                   }
-  //                 </div><hr>
-  //               `
-  //                 )
-  //                 .join("");
-  //               showInfo("Places found successfully.");
-  //             } else {
-  //               resultsContainer.innerHTML =
-  //                 "<p>No places found matching the criteria.</p>";
-  //               showInfo("No places found.");
-  //             }
-  //           })
-  //           .catch(onError);
-  //       },
-  //       (error) => {
-  //         console.error("Geolocation error:", error);
-  //         showInfo("Failed to retrieve current location.");
-  //       }
-  //     );
-  //   }
 
   function likePlace() {
     if (!currentUser) {
@@ -391,6 +333,25 @@
       .catch(onError);
   }
 
+  function viewLikedPlaces() {
+    if (!currentUser) {
+      showInfo("Please login first");
+      return;
+    }
+
+    Backendless.Data.of("Place_Likes")
+      .find({
+        condition: `userId = '${currentUser.objectId}'`,
+        properties: ["placeId"],
+      })
+      .then((likes) => {
+        if (likes.length === 0) {
+          showInfo("You have not liked any places yet.");
+          return;
+        }
+      })
+      .catch(onError);
+  }
   function viewPlaceOnMap() {
     if (!currentUser) {
       showInfo("Please login first");
@@ -403,24 +364,59 @@
       .findFirst({ where: `name = '${placeName}'` })
       .then((place) => {
         if (place) {
-          var coordinates = place.location?.coordinates;
-          if (coordinates) {
-            // Display map with place's location
-            showInfo(
-              `Showing place on map: ${
-                place.name
-              }. Coordinates: ${coordinates.join(", ")}`
-            );
-            // Additional logic to display map can be implemented here
-          } else {
-            showInfo("Location not available for this place.");
-          }
+          var location = [place.location.x, place.location.y];
+          var locationText =
+            location && location.length === 2
+              ? `${location[0]}, ${location[1]}`
+              : "Not available";
+
+          var placeInfo = `
+            <div>
+              <strong>${place.name}</strong>
+              Location: ${locationText}
+            </div><hr>
+          `;
+
+          var resultsContainer = document.getElementById("place-info");
+          resultsContainer.innerHTML = placeInfo;
+
+          // Additional logic to display map can be implemented here
         } else {
           showInfo("Place not found.");
         }
       })
       .catch(onError);
   }
+  // function viewPlaceOnMap() {
+  //   if (!currentUser) {
+  //     showInfo("Please login first");
+  //     return;
+  //   }
+
+  //   var placeName = document.getElementById("place-to-view").value;
+
+  //   Backendless.Data.of("Place")
+  //     .findFirst({ where: `name = '${placeName}'` })
+  //     .then((place) => {
+  //       if (place) {
+  //         var coordinates = [place.location.x, place.location.y];
+  //         if (coordinates) {
+  //           // Display map with place's location
+  //           showInfo(
+  //             `Showing place on map: ${
+  //               place.name
+  //             }. Coordinates: ${coordinates.join(", ")}`
+  //           );
+  //           // Additional logic to display map can be implemented here
+  //         } else {
+  //           showInfo("Location not available for this place.");
+  //         }
+  //       } else {
+  //         showInfo("Place not found.");
+  //       }
+  //     })
+  //     .catch(onError);
+  // }
 
   function saveSelectedPhoto() {
     var selectedPhotoInput = document.querySelector(

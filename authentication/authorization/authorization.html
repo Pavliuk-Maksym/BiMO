@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <link rel="stylesheet" href="../../styles.css" />
+    <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
+  </head>
+  <body>
+    <div id="auth-app">
+      <h1>Login</h1>
+      <div id="message" class="info-message"></div>
+
+      <section id="login-section">
+        <h2>Login</h2>
+        <input type="text" name="name" class="login-field" placeholder="Name" />
+        <input
+          type="password"
+          name="password"
+          class="login-field"
+          placeholder="Password"
+        />
+        <button id="login-btn">Login</button>
+      </section>
+
+      <div>
+        <p>
+          Don’t have an account?
+          <a href="../registration/registration.html">Register</a>
+        </p>
+        <p>
+          <a href="../password-recovery/password-recovery.html"
+            >Forgot Password?</a
+          >
+        </p>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
+    <script src="authorization.js"></script>
+  </body>
+</html>

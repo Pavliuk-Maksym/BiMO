@@ -3,84 +3,68 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register/Login</title>
-    <link rel="stylesheet" href="../styles.css" />
+    <title>Registration</title>
+    <link rel="stylesheet" href="../../styles.css" />
     <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
   </head>
   <body>
-    <div id="header"></div>
-
     <div id="auth-app">
-      <h1>Welcome</h1>
+      <h1>Registration</h1>
       <div id="message" class="info-message"></div>
 
       <section id="register-section">
-        <h2>Register</h2>
         <input
-          class="register-field"
           type="text"
           name="name"
+          class="register-field"
           placeholder="Name"
         />
         <input
-          class="register-field"
           type="email"
           name="email"
+          class="register-field"
           placeholder="Email"
         />
         <input
-          class="register-field"
           type="password"
           name="password"
+          class="register-field"
           placeholder="Password"
         />
         <input
-          class="register-field"
           type="number"
           name="age"
+          class="register-field"
           placeholder="Age"
         />
-        <select class="register-field" name="gender">
+        <select name="gender" class="register-field">
           <option value="">Select Gender</option>
           <option value="male">Male</option>
           <option value="female">Female</option>
         </select>
         <input
-          class="register-field"
           type="text"
           name="country"
+          class="register-field"
           placeholder="Country"
         />
         <button id="register-btn">Register</button>
       </section>
 
-      <section id="login-section">
-        <h2>Login</h2>
-        <input class="login-field" type="text" name="name" placeholder="name" />
-        <input
-          class="login-field"
-          type="password"
-          name="password"
-          placeholder="Password"
-        />
-        <button id="login-btn">Login</button>
-      </section>
-
-      <section id="forgot-password-section">
-        <h2>Forgot Password?</h2>
-        <input
-          id="forgot-password-name"
-          type="name"
-          placeholder="Enter your user name"
-        />
-        <button id="forgot-password-btn">Reset Password</button>
-      </section>
+      <div>
+        <p>
+          Already have an account?
+          <a href="../authorization/authorization.html">Login</a>
+        </p>
+        <p>
+          <a href="../password-recovery/password-recovery.html"
+            >Forgot Password?</a
+          >
+        </p>
+      </div>
     </div>
-
-    <div id="message"></div>
     <button type="button-logout" id="logout-btn">Logout</button>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
-    <script src="auth.js"></script>
+    <script src="registration.js"></script>
   </body>
 </html>

@@ -65,17 +65,30 @@
           <h3>Add Place</h3>
           <label for="place-name">Place Name:</label>
           <input type="text" id="place-name" />
+
           <label for="place-category">Category:</label>
           <input type="text" id="place-category" />
+
           <label for="place-description">Description:</label>
           <textarea id="place-description"></textarea>
+
           <label for="place-tags">Tags (comma-separated):</label>
           <input type="text" id="place-tags" />
+
           <label for="place-latitude">Latitude:</label>
           <input type="number" step="any" id="place-latitude" />
+
           <label for="place-longitude">Longitude:</label>
           <input type="number" step="any" id="place-longitude" />
+
+          <label for="place-photo">Place Photo:</label>
+          <input type="file" id="place-photo-input" />
+
           <button id="add-place-btn">Add Place</button>
+
+          <button id="add-current-user-place-btn">
+            Add My Current Position
+          </button>
         </div>
 
         <div>
@@ -105,6 +118,14 @@
           <label for="place-to-like">Place Name:</label>
           <input type="text" id="place-to-like" />
           <button id="like-place-btn">Like Place</button>
+          <button id="view-liked-places-btn">View Liked Places</button>
+          <div id="liked-places-container" class="container mt-4">
+            <!-- Карточки с местами появятся здесь -->
+          </div>
+          <button id="view-my-places-btn">View My Places</button>
+          <div id="my-places-container" class="container mt-5">
+            <!-- Карточки с местами появятся здесь -->
+          </div>
         </div>
         <div>
           <h3>View Place on Map</h3>
@@ -130,7 +151,6 @@
         <div>
           <button id="choose-existing-photo-btn">Choose Existing Photo</button>
         </div>
-
         <div id="avatar-selection-modal" style="display: none">
           <div class="modal-content">
             <h3>Select a Profile Photo</h3>

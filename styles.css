@@ -180,6 +180,14 @@ button:hover {
   margin-top: 10px;
 }
 
+#photo-selection-modal .form-check-input {
+  margin-top: 10px;
+}
+
+#photo-selection-modal button {
+  margin-top: 10px;
+}
+
 #map-container {
   width: 100%;
   height: 500px;

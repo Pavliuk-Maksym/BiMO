@@ -26,6 +26,9 @@
       .getElementById("add-place-btn")
       .addEventListener("click", addPlace);
     document
+      .getElementById("add-current-user-place-btn")
+      .addEventListener("click", addCurrentUserPlace);
+    document
       .getElementById("delete-place-btn")
       .addEventListener("click", deletePlace);
     document
@@ -34,6 +37,12 @@
     document
       .getElementById("like-place-btn")
       .addEventListener("click", likePlace);
+    document
+      .getElementById("view-liked-places-btn")
+      .addEventListener("click", viewLikedPlaces);
+    document
+      .getElementById("view-my-places-btn")
+      .addEventListener("click", viewMyPlaces);
     document
       .getElementById("view-place-on-map-btn")
       .addEventListener("click", viewPlaceOnMap);
@@ -45,6 +54,12 @@
       .addEventListener("click", saveSelectedAvatar);
     document.getElementById("close-modal-btn").addEventListener("click", () => {
       document.getElementById("avatar-selection-modal").style.display = "none";
+      document
+        .getElementById("choose-place-photo-btn")
+        .addEventListener("click", showPhotoSelectionModal);
+      document
+        .getElementById("save-photo-btn")
+        .addEventListener("click", saveSelectedPhoto);
     });
   }
 
@@ -62,9 +77,6 @@
           document.getElementById("profile-avatar").src =
             currentUser.profilePhoto;
         }
-
-        console.log("Current user:", currentUser);
-        console.log("Current user photo:", currentUser.profilePhoto);
       })
       .catch((error) => {
         alert("Error retrieving current user");
@@ -121,7 +133,7 @@
       .catch(onError);
   }
 
-  let trackingInterval;
+  var trackingInterval;
   function toggleLocationTracking() {
     if (!currentUser) {
       showInfo("Please login first");
@@ -147,9 +159,7 @@
                 currentUser = updatedUser;
                 console.log("Location updated:", currentUser["my location"]);
               })
-              .catch((error) =>
-                console.error("Error updating location:", error)
-              );
+              .catch(onError);
           },
           (error) => console.error("Geolocation error:", error),
           { enableHighAccuracy: true }
@@ -159,33 +169,70 @@
   }
 
   function addPlace() {
-    if (!currentUser) {
-      showInfo("Please login first");
-      return;
-    }
+    Backendless.UserService.getCurrentUser()
+      .then((currentUser) => {
+        if (!currentUser) {
+          showInfo("Please login first");
+          return;
+        }
 
-    var latitude = parseFloat(document.getElementById("place-latitude").value);
-    var longitude = parseFloat(
-      document.getElementById("place-longitude").value
-    );
-    var place = {
-      category: document.getElementById("place-category").value,
-      description: document.getElementById("place-description").value,
-      hashtags: document
-        .getElementById("place-tags")
-        .value.split(",")
-        .join(","),
-      location: { type: "Point", coordinates: [longitude, latitude] },
-      name: document.getElementById("place-name").value,
-      ownerId: currentUser.objectId,
-    };
+        var latitude = parseFloat(
+          document.getElementById("place-latitude").value
+        );
+        var longitude = parseFloat(
+          document.getElementById("place-longitude").value
+        );
 
+        var place = {
+          category: document.getElementById("place-category").value,
+          description: document.getElementById("place-description").value,
+          hashtags: document
+            .getElementById("place-tags")
+            .value.split(",")
+            .join(","),
+          location: { type: "Point", coordinates: [longitude, latitude] },
+          name: document.getElementById("place-name").value,
+          ownerId: currentUser.objectId,
+        };
+
+        var photo = document.getElementById("place-photo-input");
+
+        if (photo.files.length > 0) {
+          var file = photo.files[0];
+          var path = `users/${currentUser.objectId}/places/${Date.now()}_${
+            file.name
+          }`;
+
+          Backendless.Files.upload(file, path, true)
+            .then((uploadedFile) => {
+              var fileUrl = uploadedFile.fileURL;
+              place["photo"] = fileUrl;
+              updatePlaceTable(place);
+            })
+            .catch(onError);
+        } else {
+          updatePlaceTable(place);
+        }
+      })
+      .catch(onError);
+  }
+
+  function updatePlaceTable(place) {
     Backendless.Data.of("Place")
       .save(place)
       .then((savedPlace) => {
-        showInfo(`Place added successfully: ${savedPlace.objectId}`);
+        showInfo(`Place "${savedPlace.name}" added successfully.`);
       })
       .catch(onError);
+  }
+
+  function addCurrentUserPlace() {
+    navigator.geolocation.getCurrentPosition((position) => {
+      document.getElementById("place-latitude").value =
+        position.coords.latitude;
+      document.getElementById("place-longitude").value =
+        position.coords.longitude;
+    });
   }
 
   function deletePlace() {
@@ -223,13 +270,6 @@
         var latitude = position.coords.latitude;
         var longitude = position.coords.longitude;
 
-        console.log("position", position);
-        console.log("coords", position.coords);
-        console.log("latitude cords", position.coords.latitude);
-        console.log("longitude cords", position.coords.longitude);
-        console.log("latitude", latitude);
-        console.log("longitude", longitude);
-
         var whereClauses = [];
         if (searchQuery) whereClauses.push(`name LIKE '%${searchQuery}%'`);
         if (searchCategory) whereClauses.push(`category = '${searchCategory}'`);
@@ -255,19 +295,29 @@
                 .map((place) => {
                   var location = [place.location.x, place.location.y];
 
+                  var distance = calculateDistance(
+                    position.coords.latitude,
+                    position.coords.longitude,
+                    place.location.y,
+                    place.location.x
+                  );
+
                   var locationText =
                     location && location.length === 2
                       ? `${location[0]}, ${location[1]}`
                       : "Not available";
 
-                  return `
-                    <div>
-                      <strong>${place.name}</strong><br>
-                      Category: ${place.category}<br>
-                      Hashtags: ${place.hashtags}<br>
-                      Location: ${locationText}
-                    </div><hr>
-                  `;
+                  if (distance <= radius) {
+                    return `
+                      <div>
+                        <strong>${place.name}</strong><br>
+                        Category: ${place.category}<br>
+                        Hashtags: ${place.hashtags}<br>
+                        Location: ${locationText}<br>
+                        Distance: ${distance.toFixed(2)} km
+                      </div><hr>
+                    `;
+                  }
                 })
                 .join("");
               showInfo("Places found successfully.");
@@ -280,10 +330,30 @@
           .catch(onError);
       },
       (error) => {
-        console.error("Geolocation error:", error);
+        console.error(onError);
         showInfo("Failed to retrieve current location.");
       }
     );
+  }
+
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const toRad = (value) => (value * Math.PI) / 180;
+
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = R * c;
+    return distance;
   }
 
   function likePlace() {
@@ -292,31 +362,37 @@
       return;
     }
 
-    var placeName = document.getElementById("place-to-like").value;
+    const placeName = document.getElementById("place-to-like").value;
 
     Backendless.Data.of("Place")
       .findFirst({ where: `name = '${placeName}'` })
       .then((place) => {
         if (!place) {
           showInfo("Place not found.");
-          return Promise.reject();
         }
 
         return Backendless.Data.of("Place_Likes")
           .findFirst({
-            where: `placeId = '${place.objectId}' AND userId = '${currentUser.objectId}'`,
+            where: `placeId = '${place.objectId}' AND likedById = '${currentUser.objectId}'`,
           })
           .then((existingLike) => {
             if (existingLike) {
               showInfo("You have already liked this place.");
-              return Promise.reject();
             }
 
-            var like = {
-              placeId: place.objectId,
-              userId: currentUser.objectId,
-            };
-            return Backendless.Data.of("Place_Likes").save(like);
+            return Backendless.Data.of("Place")
+              .findFirst({
+                where: `name = '${placeName}'`,
+              })
+              .then((placeOwner) => {
+                const like = {
+                  placeId: place.objectId,
+                  likedById: currentUser.objectId,
+                  postedById: placeOwner.ownerId,
+                };
+
+                return Backendless.Data.of("Place_Likes").save(like);
+              });
           });
       })
       .then(() => showInfo("Place liked successfully"))
@@ -331,14 +407,100 @@
 
     Backendless.Data.of("Place_Likes")
       .find({
-        condition: `userId = '${currentUser.objectId}'`,
-        properties: ["placeId"],
+        condition: `likedById = '${currentUser.objectId}'`,
+        properties: ["placeId"], // Получаем только идентификаторы мест
       })
       .then((likes) => {
         if (likes.length === 0) {
           showInfo("You have not liked any places yet.");
           return;
         }
+
+        // Получаем список уникальных placeId
+        const placeIds = likes.map((like) => `'${like.placeId}'`).join(",");
+        return Backendless.Data.of("Place").find({
+          condition: `objectId IN (${placeIds})`, // Условие для поиска мест
+          properties: ["name", "description", "photo"], // Добавляем необходимые свойства
+        });
+      })
+      .then((places) => {
+        if (!places || places.length === 0) {
+          showInfo("No liked places found.");
+          return;
+        }
+
+        // Генерация HTML для отображения мест
+        const placesHtml = places
+          .map(
+            (place) => `
+            <div class="col-4 mb-3">
+              <div class="card">
+                <img src="${place.photo || "placeholder.jpg"}" 
+                     class="card-img-top" 
+                     alt="${place.name || "Place photo"}" 
+                     style="height: 150px; object-fit: cover;">
+                <div class="card-body text-center">
+                  <h5 class="card-title">${place.name}</h5>
+                  <p class="card-text">${
+                    place.description || "No description available"
+                  }</p>
+                </div>
+              </div>
+            </div>
+            <hr>
+          `
+          )
+          .join("");
+
+        // Вставляем HTML в контейнер
+        const container = document.getElementById("liked-places-container");
+        container.innerHTML = `<div class="row">${placesHtml}</div>`;
+      })
+      .catch(onError);
+  }
+
+  function viewMyPlaces() {
+    if (!currentUser) {
+      showInfo("Please login first");
+      return;
+    }
+
+    Backendless.Data.of("Place")
+      .find({
+        condition: `ownerId = '${currentUser.objectId}'`,
+        properties: ["name", "description", "photo"],
+      })
+      .then((places) => {
+        if (!places || places.length === 0) {
+          showInfo("You have not added any places yet.");
+          return;
+        }
+
+        const placesHtml = places
+          .map(
+            (place) => `
+            <div class="col-4 mb-3">
+              <div class="card">
+                <img src="${place.photo || "placeholder.jpg"}"
+                      class="card-img-top"
+                      alt="${place.name || "Place photo"}"
+                      style="height: 150px; object-fit: cover;">
+                <div class="card-body text-center">
+                  <h5 class="card-title
+                  ">${place.name}</h5>
+                  <p class="card-text">${
+                    place.description || "No description available"
+                  }</p>
+                </div>
+              </div>
+            </div>
+            <hr>
+          `
+          )
+          .join("");
+
+        const container = document.getElementById("my-places-container");
+        container.innerHTML = `<div class="row">${placesHtml}</div>`;
       })
       .catch(onError);
   }
@@ -414,8 +576,6 @@
       showInfo("Please login first.");
       return;
     }
-
-    console.log("Showing existing photos for user:", currentUser);
 
     var path = `users/${currentUser.objectId}/photos/`;
 

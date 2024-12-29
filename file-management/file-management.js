@@ -54,7 +54,6 @@
           return;
         }
         currentUser = user;
-        console.log("Current user:", currentUser);
       })
       .catch((error) => {
         alert("Error retrieving current user");

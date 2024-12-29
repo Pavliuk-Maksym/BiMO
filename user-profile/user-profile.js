@@ -268,11 +268,6 @@
       });
   }
 
-  // function updateAvatarDisplay() {
-  //   var avatarUrl = currentUser.profilePhoto || "/placeholder-avatar.png";
-  //   document.getElementById("profile-avatar").src = avatarUrl;
-  // }
-
   function logout() {
     Backendless.UserService.logout()
       .then(() => {

@@ -164,9 +164,6 @@
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        var latitude = position.coords.latitude;
-        var longitude = position.coords.longitude;
-
         var whereClauses = [];
         if (searchQuery) whereClauses.push(`name LIKE '%${searchQuery}%'`);
         if (searchCategory) whereClauses.push(`category = '${searchCategory}'`);
@@ -206,6 +203,7 @@
                       : "Not available";
 
                   if (distance <= radius) {
+                    showInfo("Places found successfully.");
                     return `
                     <div>
                     <img src="${place.photo || "placeholder.jpg"}" alt="${
@@ -218,14 +216,13 @@
                       Distance: ${distance.toFixed(2)} km
                     </div><hr>
                   `;
+                  } else {
+                    showInfo("No places found within the specified radius.");
+                    resultsContainer.innerHTML =
+                      "<p>No places found matching the criteria.</p>";
                   }
                 })
                 .join("");
-              showInfo("Places found successfully.");
-            } else {
-              resultsContainer.innerHTML =
-                "<p>No places found matching the criteria.</p>";
-              showInfo("No places found.");
             }
           })
           .catch(onError);
@@ -270,6 +267,7 @@
       .then((place) => {
         if (!place) {
           showInfo("Place not found.");
+          return;
         }
 
         return Backendless.Data.of("Place_Likes")
@@ -279,6 +277,7 @@
           .then((existingLike) => {
             if (existingLike) {
               showInfo("You have already liked this place.");
+              return;
             }
 
             return Backendless.Data.of("Place")
@@ -291,12 +290,11 @@
                   likedById: currentUser.objectId,
                   postedById: placeOwner.ownerId,
                 };
-
+                showInfo("Place liked successfully");
                 return Backendless.Data.of("Place_Likes").save(like);
               });
           });
       })
-      .then(() => showInfo("Place liked successfully"))
       .catch(onError);
   }
 

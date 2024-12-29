@@ -7,7 +7,7 @@ body {
 }
 
 #auth-app {
-  max-width: 600px;
+  max-width: 350px;
   margin: 20px auto;
   padding: 20px;
   background: #fff;
@@ -34,14 +34,36 @@ h1 {
   text-align: center;
 }
 
-#location-management-app {
-  max-width: 800px;
+#places-section {
+  width: 600px;
   margin: 20px auto;
   padding: 20px;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  max-height: fit-content;
+}
+
+#place-actions-section {
+  width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#location-management-app {
+  display: flex;
+  /* max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
 }
 
 input,
@@ -277,34 +299,26 @@ input:checked + .slider:before {
   transform: translateX(22px); /* ширина перемещения круга */
 }
 
-/* .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: 0.4s;
-  border-radius: 34px;
+textarea {
+  width: 97.3%;
+  padding: 10px;
+  margin: 10px;
+  margin-left: 0px;
+  padding-right: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1em;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  resize: vertical;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
 }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  transition: 0.4s;
-  border-radius: 50%;
+textarea:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+  background-color: #ffffff;
 }
-
-input:checked + .slider {
-  background-color: #007bff;
-}
-
-input:checked + .slider:before {
-  transform: translateX(26px);
-} */

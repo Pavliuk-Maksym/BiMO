@@ -19,9 +19,7 @@
       </script>
     </header>
     <main id="location-management-app">
-      <h1>Manage Locations</h1>
-      <div id="message" class="info-message"></div>
-
+      <!-- Первая секция -->
       <section id="places-section">
         <h2>Manage Places</h2>
         <div>
@@ -59,7 +57,11 @@
           <input type="text" id="place-to-delete" />
           <button id="delete-place-btn">Delete Place</button>
         </div>
+      </section>
 
+      <!-- Вторая секция -->
+      <section id="place-actions-section">
+        <h2>Place Actions</h2>
         <div>
           <h3>Search Places</h3>
           <label for="place-search-name">Search Name:</label>
@@ -71,10 +73,7 @@
           <button id="search-places-btn">Search</button>
           <div id="search-results"></div>
         </div>
-      </section>
 
-      <section id="place-actions-section">
-        <h2>Place Actions</h2>
         <div>
           <h3>Like a Place</h3>
           <label for="place-to-like">Place Name:</label>
@@ -85,6 +84,7 @@
           <button id="view-my-places-btn">View My Places</button>
           <div id="my-places-container" class="container mt-5"></div>
         </div>
+
         <div>
           <h3>View Place on Map</h3>
           <label for="place-to-view">Place Name:</label>
@@ -93,7 +93,6 @@
           <div id="map-container"></div>
         </div>
       </section>
-      <button id="logout-btn">Logout</button>
     </main>
 
     <script src="location-managment.js"></script>

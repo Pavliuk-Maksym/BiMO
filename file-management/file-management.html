@@ -19,45 +19,44 @@
       </script>
     </header>
     <div id="file-app">
-      <h1>File Management</h1>
-      <div id="message" class="info-message"></div>
+      <div id="file-action">
+        <!-- <h1>File Management</h1> -->
+        <div id="message" class="info-message"></div>
 
-      <section>
-        <h2>File Management</h2>
-        <input id="folder-name" type="text" placeholder="Folder Name" />
-        <button id="create-folder-btn">Create Folder</button>
-        <br />
-        <input id="item-name" type="text" placeholder="Item Name" />
-        <button id="delete-item-btn">Delete Item</button>
-        <br />
-        <button id="list-files-btn">List Files</button>
-        <br />
-        <input id="file-input" type="file" />
-        <button id="upload-file-btn">Upload File</button>
-        <br />
-        <input id="file-name" type="text" placeholder="File Name" />
-        <button id="download-file-btn">Download File</button>
-      </section>
+        <section>
+          <h2>File Management</h2>
+          <input id="folder-name" type="text" placeholder="Folder Name" />
+          <button id="create-folder-btn">Create Folder</button>
+          <br />
+          <input id="item-name" type="text" placeholder="Item Name" />
+          <button id="delete-item-btn">Delete Item</button>
+          <br />
+          <button id="list-files-btn">List Files</button>
+          <br />
+          <input id="file-input" type="file" />
+          <button id="upload-file-btn">Upload File</button>
+          <br />
+          <input id="file-name" type="text" placeholder="File Name" />
+          <button id="download-file-btn">Download File</button>
+        </section>
+      </div>
 
-      <section>
-        <h2>Sharing</h2>
-        <input id="share-file-name" type="text" placeholder="File Name" />
-        <input
-          id="share-with-user"
-          type="text"
-          placeholder="Share With (User Name)"
-        />
-        <button id="share-file-btn">Share File</button>
-        <br />
-        <button id="list-shared-files-btn">List Shared Files</button>
-      </section>
-
-      <section>
-        <h2>Other Features</h2>
-        <button id="take-photo-btn">Take & Upload Photo</button>
-      </section>
-      <button id="logout-btn">Logout</button>
+      <div id="file-action">
+        <section>
+          <h2>Sharing</h2>
+          <input id="share-file-name" type="text" placeholder="File Name" />
+          <input
+            id="share-with-user"
+            type="text"
+            placeholder="Share With (User Name)"
+          />
+          <button id="share-file-btn">Share File</button>
+          <br />
+          <button id="list-shared-files-btn">List Shared Files</button>
+        </section>
+      </div>
     </div>
+    <button id="logout-btn">Logout</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
     <script src="file-management.js"></script>

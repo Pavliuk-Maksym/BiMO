@@ -19,9 +19,7 @@
       .then((user) => {
         if (user) {
           showInfo("Login successful");
-          setTimeout(() => {
-            window.location.href = "../../file-management/file-management.html";
-          }, 1000);
+          window.location.href = "../../user-profile/user-profile.html";
         } else {
           showInfo("Login failed");
         }

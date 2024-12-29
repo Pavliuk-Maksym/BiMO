@@ -12,32 +12,39 @@
   Backendless.initApp(APPLICATION_ID, SECRET_KEY);
 
   initCurrentUser();
+  initEventHandlers();
 
-  document
-    .getElementById("create-folder-btn")
-    ?.addEventListener("click", createFolder);
-  document
-    .getElementById("delete-item-btn")
-    ?.addEventListener("click", deleteItem);
-  document
-    .getElementById("list-files-btn")
-    ?.addEventListener("click", listFiles);
-  document
-    .getElementById("upload-file-btn")
-    ?.addEventListener("click", uploadFile);
-  document.getElementById("logout-btn")?.addEventListener("click", logout);
-  document
-    .getElementById("download-file-btn")
-    ?.addEventListener("click", downloadFile);
-  document
-    .getElementById("share-file-btn")
-    ?.addEventListener("click", shareFile);
-  document
-    .getElementById("list-shared-files-btn")
-    ?.addEventListener("click", listSharedFiles);
-  document
-    .getElementById("take-upload-photo-btn")
-    ?.addEventListener("click", takeAndUploadPhoto);
+  function initEventHandlers() {
+    document
+      .getElementById("create-folder-btn")
+      ?.addEventListener("click", createFolder);
+
+    document
+      .getElementById("delete-item-btn")
+      ?.addEventListener("click", deleteItem);
+
+    document
+      .getElementById("list-files-btn")
+      ?.addEventListener("click", listFiles);
+
+    document
+      .getElementById("upload-file-btn")
+      ?.addEventListener("click", uploadFile);
+
+    document.getElementById("logout-btn")?.addEventListener("click", logout);
+
+    document
+      .getElementById("download-file-btn")
+      ?.addEventListener("click", downloadFile);
+
+    document
+      .getElementById("share-file-btn")
+      ?.addEventListener("click", shareFile);
+
+    document
+      .getElementById("list-shared-files-btn")
+      ?.addEventListener("click", listSharedFiles);
+  }
 
   function initCurrentUser() {
     Backendless.UserService.getCurrentUser()
@@ -206,22 +213,12 @@
       .catch(onError);
   }
 
-  function takeAndUploadPhoto() {
-    if (!currentUser) {
-      showInfo("Please login first");
-      return;
-    }
-
-    showInfo(
-      "This function requires device-specific implementation for taking photos."
-    );
-  }
-
   function logout() {
     Backendless.UserService.logout()
       .then(() => {
         currentUser = null;
-        window.location.href = "../auth/auth.html";
+        window.location.href =
+          "../authentication/authorization/authorization.html";
       })
       .catch(onError);
   }

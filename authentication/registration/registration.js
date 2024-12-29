@@ -35,6 +35,9 @@
         )
       )
       .then(() => createSharedFolder(user.name))
+      .then(() => {
+        window.location.href = "../../user-profile/user-profile.html";
+      })
       .catch(onError);
   }
 

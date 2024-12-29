@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>User Profile</title>
+    <title>User Profile Settings</title>
     <link rel="stylesheet" href="../styles.css" />
     <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
   </head>
@@ -19,153 +19,114 @@
       </script>
     </header>
 
-    <main id="user-profile-app">
-      <h1>User Profile</h1>
+    <div id="user-profile-app">
+      <!-- <h1>Profile Settings</h1> -->
       <div id="message" class="info-message"></div>
 
-      <section id="profile-section">
-        <h2>Update Profile</h2>
-        <div>
-          <label for="profile-name">Name:</label>
-          <input type="text" id="profile-name" />
-        </div>
-        <div>
-          <label for="profile-email">Email:</label>
-          <input type="email" id="profile-email" />
-        </div>
-        <div>
-          <label for="profile-age">Age:</label>
-          <input type="number" id="profile-age" />
-        </div>
-        <div>
-          <label for="profile-gender">Gender:</label>
-          <select id="profile-gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div>
-          <label for="profile-country">Country:</label>
-          <input type="text" id="profile-country" />
-        </div>
-        <button id="update-profile-btn">Update Profile</button>
-      </section>
-
-      <section id="location-tracking-section">
-        <h2>Location Tracking</h2>
-        <button id="toggle-location-tracking-btn">
-          Enable/Disable Location Tracking
-        </button>
-      </section>
-
-      <section id="places-section">
-        <h2>Manage Places</h2>
-        <div>
-          <h3>Add Place</h3>
-          <label for="place-name">Place Name:</label>
-          <input type="text" id="place-name" />
-
-          <label for="place-category">Category:</label>
-          <input type="text" id="place-category" />
-
-          <label for="place-description">Description:</label>
-          <textarea id="place-description"></textarea>
-
-          <label for="place-tags">Tags (comma-separated):</label>
-          <input type="text" id="place-tags" />
-
-          <label for="place-latitude">Latitude:</label>
-          <input type="number" step="any" id="place-latitude" />
-
-          <label for="place-longitude">Longitude:</label>
-          <input type="number" step="any" id="place-longitude" />
-
-          <label for="place-photo">Place Photo:</label>
-          <input type="file" id="place-photo-input" />
-
-          <button id="add-place-btn">Add Place</button>
-
-          <button id="add-current-user-place-btn">
-            Add My Current Position
-          </button>
-        </div>
-
-        <div>
-          <h3>Delete Place</h3>
-          <label for="place-to-delete">Place Name:</label>
-          <input type="text" id="place-to-delete" />
-          <button id="delete-place-btn">Delete Place</button>
-        </div>
-
-        <div>
-          <h3>Search Places</h3>
-          <label for="place-search-name">Search Name:</label>
-          <input type="text" id="place-search-name" />
-          <label for="place-search-category">Category:</label>
-          <input type="text" id="place-search-category" />
-          <label for="search-radius">Radius (km):</label>
-          <input type="number" step="any" id="search-radius" />
-          <button id="search-places-btn">Search</button>
-          <div id="search-results"></div>
-        </div>
-      </section>
-
-      <section id="place-actions-section">
-        <h2>Place Actions</h2>
-        <div>
-          <h3>Like a Place</h3>
-          <label for="place-to-like">Place Name:</label>
-          <input type="text" id="place-to-like" />
-          <button id="like-place-btn">Like Place</button>
-          <button id="view-liked-places-btn">View Liked Places</button>
-          <div id="liked-places-container" class="container mt-4">
-            <!-- Карточки с местами появятся здесь -->
-          </div>
-          <button id="view-my-places-btn">View My Places</button>
-          <div id="my-places-container" class="container mt-5">
-            <!-- Карточки с местами появятся здесь -->
-          </div>
-        </div>
-        <div>
-          <h3>View Place on Map</h3>
-          <label for="place-to-view">Place Name:</label>
-          <input type="text" id="place-to-view" />
-          <button id="view-place-on-map-btn">View Place</button>
-          <div id="map-container"></div>
-        </div>
-      </section>
-
-      <section id="profile-photo-section">
-        <h2>Profile Photo</h2>
-        <div>
-          <img
-            id="profile-avatar"
-            src="placeholder-avatar.png"
-            alt="Profile Avatar"
-            style="width: 150px; height: 150px; object-fit: cover"
-          />
-          <button id="update-profile-photo-btn">Update Profile Photo</button>
-          <input type="file" id="profile-photo-input" style="display: none" />
-        </div>
-        <div>
-          <button id="choose-existing-photo-btn">Choose Existing Photo</button>
-        </div>
-        <div id="avatar-selection-modal" style="display: none">
-          <div class="modal-content">
-            <h3>Select a Profile Photo</h3>
-            <div class="modal-body"></div>
-            <div class="modal-footer">
-              <button id="save-avatar-btn">Save Selected Avatar</button>
-              <button id="close-modal-btn">Close</button>
+      <!-- Контейнер для двух секций: профиля и аватара -->
+      <div id="profile-app">
+        <!-- Секция профиля -->
+        <div id="profile-action">
+          <section>
+            <h2>Update Profile</h2>
+            <div>
+              <label for="profile-name">Name:</label>
+              <input
+                type="text"
+                id="profile-name"
+                class="profile-field"
+                name="name"
+              />
             </div>
-          </div>
+
+            <div>
+              <label for="profile-email">Email:</label>
+              <input
+                type="email"
+                id="profile-email"
+                class="profile-field"
+                name="email"
+              />
+            </div>
+
+            <div>
+              <label for="profile-age">Age:</label>
+              <input
+                type="number"
+                id="profile-age"
+                class="profile-field"
+                name="age"
+              />
+            </div>
+
+            <div>
+              <label for="profile-gender">Gender:</label>
+              <select id="profile-gender" class="profile-field" name="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="profile-country">Country:</label>
+              <input
+                type="text"
+                id="profile-country"
+                class="profile-field"
+                name="country"
+              />
+            </div>
+            <button id="update-profile-btn">Update Profile</button>
+          </section>
         </div>
-      </section>
-      <button id="logout-btn">Logout</button>
-    </main>
+
+        <!-- Секция выбора аватара -->
+        <div id="avatar-action">
+          <section>
+            <h2>Profile Photo</h2>
+            <div>
+              <img
+                id="profile-avatar"
+                src="placeholder-avatar.png"
+                alt="Profile Avatar"
+                style="width: 150px; height: 150px; object-fit: cover"
+              />
+              <button id="update-profile-photo-btn">
+                Update Profile Photo
+              </button>
+              <input
+                type="file"
+                id="profile-photo-input"
+                style="display: none"
+                class="profile-photo"
+              />
+            </div>
+            <div>
+              <button id="choose-existing-photo-btn">
+                Choose Existing Photo
+              </button>
+            </div>
+            <div id="avatar-selection-modal" style="display: none">
+              <div class="modal-content">
+                <h3>Select a Profile Photo</h3>
+                <div class="modal-body"></div>
+                <div class="modal-footer">
+                  <button id="save-avatar-btn">Save Selected Avatar</button>
+                  <button id="close-modal-btn">Close</button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+    <button id="logout-btn">Logout</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
+    <script src="user-profile.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
+    <script src="user-profile.js"></script>
   </body>
 </html>
-<script src="user-profile.js"></script>

@@ -7,7 +7,7 @@ body {
 }
 
 #auth-app {
-  max-width: 400px;
+  max-width: 600px;
   margin: 20px auto;
   padding: 20px;
   background: #fff;
@@ -17,7 +17,11 @@ body {
 }
 
 #file-app {
-  max-width: 800px;
+  display: flex;
+}
+
+#file-action {
+  width: 600px;
   margin: 20px auto;
   padding: 20px;
   background: #fff;
@@ -28,6 +32,16 @@ body {
 
 h1 {
   text-align: center;
+}
+
+#location-management-app {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 input,
@@ -122,19 +136,29 @@ button:hover {
   background-color: #0056b3;
 }
 
-#profile-section {
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-#user-profile-app {
-  max-width: 800px;
+#profile-action {
+  width: 600px;
   margin: 20px auto;
   padding: 20px;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#avatar-action {
+  width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#profile-app {
+  display: flex;
+  align-items: center;
 }
 
 #avatar-selection-modal {

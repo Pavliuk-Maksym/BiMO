@@ -413,11 +413,13 @@
       .then((likes) => {
         if (likes.length === 0) {
           showInfo("You have not liked any places yet.");
-          return;
+          return [];
         }
 
         // Получаем список уникальных placeId
         const placeIds = likes.map((like) => `'${like.placeId}'`).join(",");
+        console.log(`Place IDs: ${placeIds}`); // Лог для проверки
+
         return Backendless.Data.of("Place").find({
           condition: `objectId IN (${placeIds})`, // Условие для поиска мест
           properties: ["name", "description", "photo"], // Добавляем необходимые свойства
@@ -447,7 +449,6 @@
                 </div>
               </div>
             </div>
-            <hr>
           `
           )
           .join("");
@@ -458,6 +459,66 @@
       })
       .catch(onError);
   }
+
+  // function viewLikedPlaces() {
+  //   if (!currentUser) {
+  //     showInfo("Please login first");
+  //     return;
+  //   }
+
+  //   Backendless.Data.of("Place_Likes")
+  //     .find({
+  //       condition: `likedById = '${currentUser.objectId}'`,
+  //       properties: ["placeId"], // Получаем только идентификаторы мест
+  //     })
+  //     .then((likes) => {
+  //       if (likes.length === 0) {
+  //         showInfo("You have not liked any places yet.");
+  //         return;
+  //       }
+
+  //       // Получаем список уникальных placeId
+  //       const placeIds = likes.map((like) => `'${like.placeId}'`).join(",");
+  //       return Backendless.Data.of("Place").find({
+  //         condition: `objectId IN (${placeIds})`, // Условие для поиска мест
+  //         properties: ["name", "description", "photo"], // Добавляем необходимые свойства
+  //       });
+  //     })
+  //     .then((places) => {
+  //       if (!places || places.length === 0) {
+  //         showInfo("No liked places found.");
+  //         return;
+  //       }
+
+  //       // Генерация HTML для отображения мест
+  //       const placesHtml = places
+  //         .map(
+  //           (place) => `
+  //           <div class="col-4 mb-3">
+  //             <div class="card">
+  //               <img src="${place.photo || "placeholder.jpg"}"
+  //                    class="card-img-top"
+  //                    alt="${place.name || "Place photo"}"
+  //                    style="height: 150px; object-fit: cover;">
+  //               <div class="card-body text-center">
+  //                 <h5 class="card-title">${place.name}</h5>
+  //                 <p class="card-text">${
+  //                   place.description || "No description available"
+  //                 }</p>
+  //               </div>
+  //             </div>
+  //           </div>
+  //           <hr>
+  //         `
+  //         )
+  //         .join("");
+
+  //       // Вставляем HTML в контейнер
+  //       const container = document.getElementById("liked-places-container");
+  //       container.innerHTML = `<div class="row">${placesHtml}</div>`;
+  //     })
+  //     .catch(onError);
+  // }
 
   function viewMyPlaces() {
     if (!currentUser) {

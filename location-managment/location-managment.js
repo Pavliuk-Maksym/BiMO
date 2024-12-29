@@ -223,6 +223,10 @@
                   }
                 })
                 .join("");
+            } else {
+              showInfo("No location is available right now.");
+              resultsContainer.innerHTML =
+                "<p>No places found matching the criteria.</p>";
             }
           })
           .catch(onError);
@@ -235,22 +239,22 @@
   }
 
   function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const toRad = (value) => (value * Math.PI) / 180;
+    var R = 6371;
+    var toRad = (value) => (value * Math.PI) / 180;
 
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
+    var dLat = toRad(lat2 - lat1);
+    var dLon = toRad(lon2 - lon1);
 
-    const a =
+    var a =
       Math.sin(dLat / 2) * Math.sin(dLat / 2) +
       Math.cos(toRad(lat1)) *
         Math.cos(toRad(lat2)) *
         Math.sin(dLon / 2) *
         Math.sin(dLon / 2);
 
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
-    const distance = R * c;
+    var distance = R * c;
     return distance;
   }
 
@@ -260,7 +264,7 @@
       return;
     }
 
-    const placeName = document.getElementById("place-to-like").value;
+    var placeName = document.getElementById("place-to-like").value;
 
     Backendless.Data.of("Place")
       .findFirst({ where: `name = '${placeName}'` })
@@ -285,7 +289,7 @@
                 where: `name = '${placeName}'`,
               })
               .then((placeOwner) => {
-                const like = {
+                var like = {
                   placeId: place.objectId,
                   likedById: currentUser.objectId,
                   postedById: placeOwner.ownerId,
@@ -307,99 +311,153 @@
     Backendless.Data.of("Place_Likes")
       .find({
         condition: `likedById = '${currentUser.objectId}'`,
-        properties: ["placeId"], // Получаем только идентификаторы мест
+        properties: ["placeId"],
       })
       .then((likes) => {
         if (likes.length === 0) {
           showInfo("You have not liked any places yet.");
-          return;
+          return [];
         }
 
-        // Получаем список уникальных placeId
-        const placeIds = likes.map((like) => `'${like.placeId}'`).join(",");
-        return Backendless.Data.of("Place").find({
-          condition: `objectId IN (${placeIds})`, // Условие для поиска мест
-          properties: ["name", "description", "photo"], // Добавляем необходимые свойства
-        });
+        var placeIds = likes.map((like) => like.placeId);
+        console.log(`Place IDs: ${placeIds}`);
+
+        return Backendless.Data.of("Place")
+          .find({
+            condition: `objectId IN (${placeIds
+              .map((id) => `'${id}'`)
+              .join(",")})`,
+            properties: ["name", "description", "photo", "objectId"],
+          })
+          .then((places) => {
+            var filteredPlaces = places.filter((place) =>
+              placeIds.includes(place.objectId)
+            );
+            console.log("Filtered places:", filteredPlaces);
+            return filteredPlaces;
+          });
       })
-      .then((places) => {
-        if (!places || places.length === 0) {
+      .then((filteredPlaces) => {
+        if (!filteredPlaces || filteredPlaces.length === 0) {
           showInfo("No liked places found.");
           return;
         }
 
-        // Генерация HTML для отображения мест
-        const placesHtml = places
+        var placesHtml = filteredPlaces
           .map(
             (place) => `
-              <div class="col-4 mb-3">
-                <div class="card">
-                  <img src="${place.photo || "placeholder.jpg"}" 
-                       class="card-img-top" 
-                       alt="${place.name || "Place photo"}" 
-                       style="height: 150px; object-fit: cover;">
-                  <div class="card-body text-center">
-                    <h5 class="card-title">${place.name}</h5>
-                    <p class="card-text">${
-                      place.description || "No description available"
-                    }</p>
-                  </div>
+            <div class="col-4 mb-3">
+              <div class="card">
+                <img src="${
+                  place.photo || "placeholder.jpg"
+                }" class="card-img-top" alt="${
+              place.name || "Place photo"
+            }" style="height: 150px; object-fit: cover;">
+                <div class="card-body text-center">
+                  <h5 class="card-title">${place.name}</h5>
+                  <p class="card-text">${
+                    place.description || "No description available"
+                  }</p>
                 </div>
               </div>
-              <hr>
-            `
+            </div>
+          `
           )
           .join("");
 
-        // Вставляем HTML в контейнер
-        const container = document.getElementById("liked-places-container");
+        var container = document.getElementById("liked-places-container");
         container.innerHTML = `<div class="row">${placesHtml}</div>`;
+
+        if (filteredPlaces.length > 0) {
+          var closeButton = document.createElement("button");
+          closeButton.textContent = "Close Results";
+          closeButton.classList.add("red-btn");
+          closeButton.style.width = "auto";
+          closeButton.style.marginTop = "20px";
+
+          closeButton.addEventListener("click", () => {
+            document.getElementById("liked-places-container").innerHTML = "";
+          });
+
+          container.appendChild(closeButton);
+          showInfo("Places found successfully.");
+        }
       })
-      .catch(onError);
+      .catch((error) => {
+        console.error("An error occurred:", error);
+        showInfo("An error occurred while retrieving your liked places.");
+      });
   }
 
   function viewMyPlaces() {
-    if (!currentUser) {
-      showInfo("Please login first");
-      return;
-    }
-
-    Backendless.Data.of("Place")
-      .find({
-        condition: `ownerId = '${currentUser.objectId}'`,
-        properties: ["name", "description", "photo"],
-      })
-      .then((places) => {
-        if (!places || places.length === 0) {
-          showInfo("You have not added any places yet.");
+    Backendless.UserService.getCurrentUser()
+      .then((currentUser) => {
+        if (!currentUser) {
+          showInfo("Please login first");
           return;
         }
 
-        const placesHtml = places
-          .map(
-            (place) => `
-              <div class="col-4 mb-3">
-                <div class="card">
-                  <img src="${place.photo || "placeholder.jpg"}"
-                        class="card-img-top"
-                        alt="${place.name || "Place photo"}"
-                        style="height: 150px; object-fit: cover;">
-                  <div class="card-body text-center">
-                    <h5 class="card-title
-                    ">${place.name}</h5>
-                    <p class="card-text">${
-                      place.description || "No description available"
-                    }</p>
-                  </div>
-                </div>
-              </div>
-              <hr>
-            `
-          )
-          .join("");
+        Backendless.Data.of("Place")
+          .find({ where: `ownerId = '${currentUser.objectId}'` })
+          .then((places) => {
+            console.log("Places:", places);
+            var resultsContainer = document.getElementById(
+              "my-places-container"
+            );
+            if (places.length > 0) {
+              resultsContainer.innerHTML = places
+                .map((place) => {
+                  console.log("Place:", place);
+                  var location = [place.location.x, place.location.y];
 
-        const container = document.getElementById("my-places-container");
-        container.innerHTML = `<div class="row">${placesHtml}</div>`;
+                  var locationText =
+                    location && location.length === 2
+                      ? `${location[0]}, ${location[1]}`
+                      : "Not available";
+                  console.log("locationText", locationText);
+
+                  var photoHtml;
+                  if (place.photo) {
+                    photoHtml = `<img src="${place.photo}" class="img-search">`;
+                  }
+
+                  return `${photoHtml}
+                  <div style="margin-top: 20px; text-align: left;">
+                    <strong>${place.name}</strong><br>
+                    Category: ${place.category}<br>
+                    Hashtags: ${place.hashtags}<br>
+                    Location: ${locationText}
+                  </div>
+                  <hr style="margin-top: 20px;">
+                `;
+                })
+                .join("");
+
+              if (resultsContainer.innerHTML.length > 0) {
+                resultsContainer.innerHTML =
+                  resultsContainer.innerHTML +
+                  `
+                <button type="button" id="close-view-results" class="red-btn" style="width: auto;">Close Results</button>
+              `;
+                document
+                  .getElementById("close-view-results")
+                  .addEventListener("click", () => {
+                    document.getElementById("my-places-container").innerHTML =
+                      "";
+                  });
+                showInfo("Places found successfully.");
+              } else {
+                resultsContainer.innerHTML =
+                  '<p style="margin-top: 20px;">No places found matching the criteria.</p>';
+                showInfo("No places found.");
+              }
+            } else {
+              resultsContainer.innerHTML =
+                '<p style="margin-top: 20px;">No places found matching the criteria.</p>';
+              showInfo("No places found.");
+            }
+          })
+          .catch(onError);
       })
       .catch(onError);
   }
@@ -422,7 +480,7 @@
 
         var mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}&z=${zoomLevel}&output=embed`;
 
-        const viewPlace = document.getElementById("view-place-on-map-btn");
+        var viewPlace = document.getElementById("view-place-on-map-btn");
         var mapContainer = document.getElementById("map-container");
 
         var iframe = document.createElement("iframe");
@@ -430,12 +488,29 @@
         iframe.loading = "lazy";
         iframe.allowFullscreen = true;
 
+        mapContainer.innerHTML = "";
         mapContainer.appendChild(iframe);
         mapContainer.style.display = "block";
 
         viewPlace.disabled = true;
+
+        var closeButton = document.createElement("button");
+        closeButton.textContent = "Close Map View";
+        closeButton.classList.add("red-btn");
+        closeButton.style.width = "auto";
+        closeButton.style.marginTop = "20px";
+
+        closeButton.addEventListener("click", () => {
+          mapContainer.innerHTML = "";
+          mapContainer.style.display = "none";
+          viewPlace.disabled = false;
+        });
+
+        mapContainer.appendChild(closeButton);
+
+        showInfo("Map loaded successfully.");
       })
-      .catch(showInfo("Place not found"));
+      .catch(() => showInfo("Place not found"));
   }
 
   function logout() {

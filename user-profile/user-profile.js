@@ -167,7 +167,7 @@
           "block";
       }
     });
-    // .catch(onError);
+    
   }
 
   function saveSelectedAvatar() {

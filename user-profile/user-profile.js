@@ -18,6 +18,10 @@
     document.getElementById("logout-btn")?.addEventListener("click", logout);
 
     document
+      .getElementById("toggle-location-tracking-btn")
+      .addEventListener("click", toggleLocationTracking);
+
+    document
       .getElementById("update-profile-btn")
       .addEventListener("click", updateProfile);
 
@@ -78,6 +82,41 @@
         alert("Error retrieving current user");
         console.error(error);
       });
+  }
+
+  var trackingInterval;
+  function toggleLocationTracking() {
+    if (!currentUser) {
+      showInfo("Please login first");
+      return;
+    }
+
+    if (trackingInterval) {
+      clearInterval(trackingInterval);
+      trackingInterval = null;
+      showInfo("Location tracking disabled.");
+    } else {
+      showInfo("Location tracking enabled.");
+      trackingInterval = setInterval(() => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            var { latitude, longitude } = position.coords;
+            currentUser["my location"] = {
+              type: "Point",
+              coordinates: [longitude, latitude],
+            };
+            Backendless.UserService.update(currentUser)
+              .then((updatedUser) => {
+                currentUser = updatedUser;
+                console.log("Location updated:", currentUser["my location"]);
+              })
+              .catch(onError);
+          },
+          (error) => console.error("Geolocation error:", error),
+          { enableHighAccuracy: true }
+        );
+      }, 60000);
+    }
   }
 
   function updateProfile() {

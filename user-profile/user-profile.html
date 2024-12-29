@@ -82,42 +82,52 @@
         </div>
 
         <!-- Секция выбора аватара -->
-        <div id="avatar-action">
-          <section>
-            <h2>Profile Photo</h2>
-            <div>
-              <img
-                id="profile-avatar"
-                src="placeholder-avatar.png"
-                alt="Profile Avatar"
-                style="width: 150px; height: 150px; object-fit: cover"
-              />
-              <button id="update-profile-photo-btn">
-                Update Profile Photo
-              </button>
-              <input
-                type="file"
-                id="profile-photo-input"
-                style="display: none"
-                class="profile-photo"
-              />
-            </div>
-            <div>
-              <button id="choose-existing-photo-btn">
-                Choose Existing Photo
-              </button>
-            </div>
-            <div id="avatar-selection-modal" style="display: none">
-              <div class="modal-content">
-                <h3>Select a Profile Photo</h3>
-                <div class="modal-body"></div>
-                <div class="modal-footer">
-                  <button id="save-avatar-btn">Save Selected Avatar</button>
-                  <button id="close-modal-btn">Close</button>
+        <div id="avatar-and-location">
+          <div id="avatar-action">
+            <section>
+              <h2>Profile Photo</h2>
+              <div>
+                <img
+                  id="profile-avatar"
+                  src="placeholder-avatar.png"
+                  alt="Profile Avatar"
+                  style="width: 150px; height: 150px; object-fit: cover"
+                />
+                <button id="update-profile-photo-btn">
+                  Update Profile Photo
+                </button>
+                <input
+                  type="file"
+                  id="profile-photo-input"
+                  style="display: none"
+                  class="profile-photo"
+                />
+              </div>
+              <div>
+                <button id="choose-existing-photo-btn">
+                  Choose Existing Photo
+                </button>
+              </div>
+              <div id="avatar-selection-modal" style="display: none">
+                <div class="modal-content">
+                  <h3>Select a Profile Photo</h3>
+                  <div class="modal-body"></div>
+                  <div class="modal-footer">
+                    <button id="save-avatar-btn">Save Selected Avatar</button>
+                    <button id="close-modal-btn">Close</button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
+
+          <div id="location-action">
+            <h2>Location Tracking</h2>
+            <label class="switch" style="margin-bottom: 10px">
+              <input type="checkbox" id="toggle-location-tracking-btn" />
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
       </div>
     </div>

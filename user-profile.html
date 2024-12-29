@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -120,11 +120,11 @@
           <button id="like-place-btn">Like Place</button>
           <button id="view-liked-places-btn">View Liked Places</button>
           <div id="liked-places-container" class="container mt-4">
-            <!-- Карточки с местами появятся здесь -->
+
           </div>
           <button id="view-my-places-btn">View My Places</button>
           <div id="my-places-container" class="container mt-5">
-            <!-- Карточки с местами появятся здесь -->
+
           </div>
         </div>
         <div>
@@ -168,4 +168,143 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
   </body>
 </html>
-<script src="user-profile.js"></script>
+<script src="user-profile.js"></script> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile Settings</title>
+    <link rel="stylesheet" href="../styles.css" />
+    <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
+  </head>
+  <body>
+    <header id="header">
+      <script>
+        fetch("../header.html")
+          .then((response) => response.text())
+          .then((html) => {
+            document.getElementById("header").innerHTML = html;
+          })
+          .catch((error) => console.error("Error loading header:", error));
+      </script>
+    </header>
+
+    <div id="user-profile-app">
+      <!-- <h1>Profile Settings</h1> -->
+      <div id="message" class="info-message"></div>
+
+      <!-- Контейнер для двух секций: профиля и аватара -->
+      <div id="profile-app">
+        <!-- Секция профиля -->
+        <div id="profile-action">
+          <section>
+            <h2>Update Profile</h2>
+            <div>
+              <label for="profile-name">Name:</label>
+              <input
+                type="text"
+                id="profile-name"
+                class="profile-field"
+                name="name"
+              />
+            </div>
+
+            <div>
+              <label for="profile-email">Email:</label>
+              <input
+                type="email"
+                id="profile-email"
+                class="profile-field"
+                name="email"
+              />
+            </div>
+
+            <div>
+              <label for="profile-age">Age:</label>
+              <input
+                type="number"
+                id="profile-age"
+                class="profile-field"
+                name="age"
+              />
+            </div>
+
+            <div>
+              <label for="profile-gender">Gender:</label>
+              <select id="profile-gender" class="profile-field" name="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="profile-country">Country:</label>
+              <input
+                type="text"
+                id="profile-country"
+                class="profile-field"
+                name="country"
+              />
+            </div>
+            <button id="update-profile-btn">Update Profile</button>
+          </section>
+        </div>
+
+        <!-- Секция выбора аватара -->
+        <div>
+          <div id="avatar-action">
+            <section>
+              <h2>Profile Photo</h2>
+              <div>
+                <img
+                  id="profile-avatar"
+                  src="placeholder-avatar.png"
+                  alt="Profile Avatar"
+                  style="width: 150px; height: 150px; object-fit: cover"
+                />
+                <button id="update-profile-photo-btn">
+                  Update Profile Photo
+                </button>
+                <input
+                  type="file"
+                  id="profile-photo-input"
+                  style="display: none"
+                  class="profile-photo"
+                />
+              </div>
+              <div>
+                <button id="choose-existing-photo-btn">
+                  Choose Existing Photo
+                </button>
+              </div>
+              <div id="avatar-selection-modal" style="display: none">
+                <div class="modal-content">
+                  <h3>Select a Profile Photo</h3>
+                  <div class="modal-body"></div>
+                  <div class="modal-footer">
+                    <button id="save-avatar-btn">Save Selected Avatar</button>
+                    <button id="close-modal-btn">Close</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+        <div id="avatar-action">
+          <h2 style="margin-top: 50px">Location Tracking</h2>
+          <label class="switch" style="margin-bottom: 10px">
+            <input type="checkbox" id="toggle-location-tracking" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <button id="logout-btn">Logout</button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
+    <script src="user-profile.js"></script>
+  </body>
+</html>

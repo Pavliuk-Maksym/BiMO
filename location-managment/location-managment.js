@@ -31,10 +31,6 @@
 
   function initEventHandlers() {
     document
-      .getElementById("toggle-location-tracking-btn")
-      .addEventListener("click", toggleLocationTracking);
-
-    document
       .getElementById("add-place-btn")
       .addEventListener("click", addPlace);
 
@@ -67,41 +63,6 @@
       .addEventListener("click", viewPlaceOnMap);
 
     document.getElementById("logout-btn")?.addEventListener("click", logout);
-  }
-
-  var trackingInterval;
-  function toggleLocationTracking() {
-    if (!currentUser) {
-      showInfo("Please login first");
-      return;
-    }
-
-    if (trackingInterval) {
-      clearInterval(trackingInterval);
-      trackingInterval = null;
-      showInfo("Location tracking disabled.");
-    } else {
-      showInfo("Location tracking enabled.");
-      trackingInterval = setInterval(() => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            var { latitude, longitude } = position.coords;
-            currentUser["my location"] = {
-              type: "Point",
-              coordinates: [longitude, latitude],
-            };
-            Backendless.UserService.update(currentUser)
-              .then((updatedUser) => {
-                currentUser = updatedUser;
-                console.log("Location updated:", currentUser["my location"]);
-              })
-              .catch(onError);
-          },
-          (error) => console.error("Geolocation error:", error),
-          { enableHighAccuracy: true }
-        );
-      }, 60000);
-    }
   }
 
   function addPlace() {
@@ -214,6 +175,7 @@
         queryBuilder.setWhereClause(whereClauses.join(" AND "));
         queryBuilder.setProperties([
           "objectId",
+          "photo",
           "name",
           "category",
           "description",
@@ -246,6 +208,9 @@
                   if (distance <= radius) {
                     return `
                     <div>
+                    <img src="${place.photo || "placeholder.jpg"}" alt="${
+                      place.name || "Place photo"
+                    }" style="height: 100px; object-fit: cover;"><br>
                       <strong>${place.name}</strong><br>
                       Category: ${place.category}<br>
                       Hashtags: ${place.hashtags}<br>
@@ -472,7 +437,7 @@
 
         viewPlace.disabled = true;
       })
-      .catch(onError);
+      .catch(showInfo("Place not found"));
   }
 
   function logout() {

@@ -116,10 +116,12 @@ button:hover {
 
 .navigation {
   display: flex;
+  /* width: 98.5%; */
   gap: 10px;
   padding: 10px;
   background-color: #f0f0f0;
   border-bottom: 2px solid #ccc;
+  /* position: fixed; */
 }
 
 .navigation button {
@@ -138,6 +140,7 @@ button:hover {
 
 #profile-action {
   width: 600px;
+  height: 485px;
   margin: 20px auto;
   padding: 20px;
   background: #fff;
@@ -147,6 +150,16 @@ button:hover {
 }
 
 #avatar-action {
+  width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#location-action {
   width: 600px;
   margin: 20px auto;
   padding: 20px;
@@ -218,8 +231,80 @@ button:hover {
   border: 1px solid #ccc;
   display: none;
 }
+
 iframe {
   width: 100%;
   height: 100%;
   border: none;
 }
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px; /* ширина переключателя */
+  height: 28px; /* высота переключателя */
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px; /* размер круга */
+  width: 22px;
+  left: 3px; /* отступ от левого края */
+  bottom: 3px; /* отступ от нижнего края */
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #007bff;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px); /* ширина перемещения круга */
+}
+
+/* .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.4s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #007bff;
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+} */

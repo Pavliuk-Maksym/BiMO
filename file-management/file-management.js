@@ -142,11 +142,26 @@
 
     const fileInput = document.getElementById("file-input");
     const file = fileInput.files[0];
+
+    if (!file) {
+      alert("No file selected");
+      return;
+    }
+
     const path = `/${currentUser.name}/${file.name}`;
 
     Backendless.Files.upload(file, path, true)
       .then(() => showInfo("File uploaded successfully"))
-      .catch(onError);
+      .catch((error) => {
+        uploadFileError("File upload fail", file.name, path, currentUser.name);
+      });
+  }
+
+  function uploadFileError(logger, fileName, path, username) {
+    showInfo("File upload fail");
+    Backendless.Logging.getLogger(logger).error(
+      `Failed to upload file '${fileName}' to path '${path}' by user '${username}'.`
+    );
   }
 
   function downloadFile() {

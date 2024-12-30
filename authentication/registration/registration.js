@@ -35,6 +35,12 @@
         )
       )
       .then(() => createSharedFolder(user.name))
+      .then(() =>
+        setInterval(
+          () => (window.location.href = "../authorization/authorization.html"),
+          5500
+        )
+      )
       .catch(onError);
   }
 

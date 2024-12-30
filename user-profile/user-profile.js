@@ -15,7 +15,24 @@
   initProfilePhotoHandlers();
 
   function initEventHandlers() {
-    document.getElementById("logout-btn")?.addEventListener("click", logout);
+    document.addEventListener("DOMContentLoaded", () => {
+      fetch("../footer.html")
+        .then((response) => response.text())
+        .then((html) => {
+          document.getElementById("footer").innerHTML = html;
+
+          const logoutButton = document
+            .getElementById("footer")
+            ?.querySelector(".footer-nav #logout-btn");
+
+          if (logoutButton) {
+            logoutButton.addEventListener("click", logout);
+          } else {
+            console.error("Logout button not found in footer.");
+          }
+        })
+        .catch((error) => console.error("Error loading footer:", error));
+    });
 
     document
       .getElementById("toggle-location-tracking-btn")
@@ -167,7 +184,6 @@
           "block";
       }
     });
-    
   }
 
   function saveSelectedAvatar() {

@@ -20,11 +20,25 @@
         if (user) {
           showInfo("Login successful");
           window.location.href = "../../user-profile/user-profile.html";
-        } else {
-          showInfo("Login failed");
         }
       })
-      .catch(onError);
+      .catch((error) => {
+        loginError("Login failed.", login.name, login.password);
+      });
+  }
+
+  function loginError(logger, username, password) {
+    showInfo("Login failed");
+    Backendless.Logging.getLogger(logger).error(
+      `Login failed. Entered username: '${username}', Entered password: '${password}'`
+    );
+  }
+
+  function loginError(logger, username, password) {
+    showInfo("Login failed");
+    Backendless.Logging.getLogger(logger).error(
+      `Login failed Entered username: '${username}' Entered password: '${password}'`
+    );
   }
 
   function onError(error) {

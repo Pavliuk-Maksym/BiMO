@@ -128,7 +128,16 @@
           updatePlaceTable(place);
         }
       })
-      .catch(onError);
+      .catch((error) => {
+        addPlaceError("Failed add place", place.name, currentUser.name);
+      });
+  }
+
+  function addPlaceError(logger, placeName, username) {
+    showInfo("Failed place add.");
+    Backendless.Logging.getLogger(logger).error(
+      `Failed to add place '${placeName}' by user '${username}'.`
+    );
   }
 
   function updatePlaceTable(place) {

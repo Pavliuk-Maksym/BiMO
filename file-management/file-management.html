@@ -18,9 +18,8 @@
           .catch((error) => console.error("Error loading header:", error));
       </script>
     </header>
-    <div id="file-app">
+    <main id="file-app">
       <div id="file-action">
-        
         <div id="message" class="info-message"></div>
 
         <section>
@@ -55,10 +54,18 @@
           <button id="list-shared-files-btn">List Shared Files</button>
         </section>
       </div>
-    </div>
-    <button id="logout-btn">Logout</button>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
-    <script src="file-management.js"></script>
+    </main>
+    <footer id="footer">
+      <script>
+        fetch("../footer.html")
+          .then((response) => response.text())
+          .then((html) => {
+            document.getElementById("footer").innerHTML = html;
+          })
+          .catch((error) => console.error("Error loading footer:", error));
+      </script>
+    </footer>
   </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
+  <script src="file-management.js"></script>
 </html>

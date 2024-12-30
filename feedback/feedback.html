@@ -4,21 +4,49 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Feedback</title>
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../assets/styles.css" />
     <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
   </head>
   <body>
     <header id="header">
       <script>
-        fetch("../header.html")
+        fetch("../assets/header.html")
           .then((response) => response.text())
           .then((html) => {
             document.getElementById("header").innerHTML = html;
           })
           .catch((error) => console.error("Error loading header:", error));
       </script>
-    <main></main>
-    <footer></footer>
+    </header>
+    <main>
+      <div id="feedback-app">
+        <div id="message" class="info-message"></div>
+        <section>
+          <h2>Feedback</h2>
+          <label for="feedback-theme">Feedback Theme:</label>
+          <select name="theme" class="theme-fiels" id="feedback-theme">
+            <option value="">Select a Theme</option>
+            <option value="Error">Error</option>
+            <option value="Suggestion">Suggestion</option>
+          </select>
+
+          <label for="feedback-message">Message:</label>
+          <textarea id="feedback-message"></textarea>
+
+          <button id="send-feedback-btn">Send Feedback</button>
+        </section>
+      </div>
+    </main>
+    <footer id="footer">
+      <script>
+        fetch("../assets/footer.html")
+          .then((response) => response.text())
+          .then((html) => {
+            document.getElementById("footer").innerHTML = html;
+          })
+          .catch((error) => console.error("Error loading footer:", error));
+      </script>
+    </footer>
   </body>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/backendless/5.7.3/backendless.min.js"></script>
   <script src="feedback.js"></script>

@@ -4,13 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>File Management Dashboard</title>
-    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="../assets/styles.css" />
     <script src="http://api.backendless.com/sdk/js/latest/backendless.min.js"></script>
   </head>
   <body>
     <header id="header">
       <script>
-        fetch("../header.html")
+        fetch("../assets/header.html")
           .then((response) => response.text())
           .then((html) => {
             document.getElementById("header").innerHTML = html;
@@ -57,7 +57,7 @@
     </main>
     <footer id="footer">
       <script>
-        fetch("../footer.html")
+        fetch("../assets/footer.html")
           .then((response) => response.text())
           .then((html) => {
             document.getElementById("footer").innerHTML = html;

@@ -32,7 +32,7 @@
       ?.addEventListener("click", uploadFile);
 
     document.addEventListener("DOMContentLoaded", () => {
-      fetch("../footer.html")
+      fetch("../assets/footer.html")
         .then((response) => response.text())
         .then((html) => {
           document.getElementById("footer").innerHTML = html;

@@ -176,6 +176,8 @@ main {
   background-color: #0056b3;
 }
 
+#friends-managment,
+#find-friends,
 #profile-action {
   width: 600px;
   height: 485px;
@@ -207,6 +209,7 @@ main {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+#friends-app,
 #profile-app {
   display: flex;
   align-items: center;

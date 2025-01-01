@@ -69,7 +69,7 @@
     const message = document.getElementById("feedback-message").value;
 
     if (!theme || !message) {
-      alert("Please, provie a feedback.");
+      showInfo("Please, provie a feedback.");
       return;
     }
 

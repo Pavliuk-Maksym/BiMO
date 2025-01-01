@@ -6,9 +6,34 @@ body {
   color: #333;
 }
 
+#auth-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+#register-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+
+#password-recovery-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 65vh;
+}
+
 #auth-app {
   max-width: 350px;
   margin: 20px auto;
+  justify-content: center;
   padding: 20px;
   background: #fff;
   border: 1px solid #ddd;
@@ -63,7 +88,7 @@ input,
 button,
 select {
   width: 100%;
-  margin-bottom: 10px;
+  margin: 10px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -139,17 +164,27 @@ button:hover {
 
 main {
   padding-top: 70px;
+  padding-bottom: 70px;
 }
 
 .navigation {
   display: flex;
   flex-direction: row;
   position: fixed;
-  padding: 10px;
+  align-items: space-between;
+  justify-content: space-between;
+  padding-right: 10px;
   background-color: #f0f0f0;
   border-bottom: 2px solid #ccc;
-  width: 98.5%;
+  width: 100%;
   gap: 10px;
+}
+
+footer {
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  position: fixed;
 }
 
 .footer-nav {
@@ -157,7 +192,6 @@ main {
   flex-direction: row;
   justify-content: space-between;
   text-align: space-around;
-  padding: 10px;
   background-color: #f0f0f0;
   border-top: 2px solid #ccc;
 }
@@ -166,7 +200,7 @@ main {
   background-color: #007bff;
   color: white;
   border: none;
-  padding: 10px 20px;
+
   font-size: 16px;
   cursor: pointer;
   border-radius: 5px;
@@ -176,17 +210,30 @@ main {
   background-color: #0056b3;
 }
 
+#user-profile-app {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: space-around;
+  height: max-content;
+}
+
 #friends-managment,
-#find-friends,
+#friends-actions,
 #profile-action {
   width: 600px;
   height: 485px;
   margin: 20px auto;
   padding: 20px;
+  height: max-content;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#profile-action {
+  height: 505px;
 }
 
 #avatar-action {
@@ -212,7 +259,10 @@ main {
 #friends-app,
 #profile-app {
   display: flex;
-  align-items: center;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: space-around;
+  gap: 20px;
 }
 
 #avatar-selection-modal {

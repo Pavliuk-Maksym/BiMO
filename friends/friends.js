@@ -43,7 +43,6 @@
       console.error("Find Friend button not found");
     }
 
-    // Загрузка и настройка футера
     fetch("../assets/footer.html")
       .then((response) => response.text())
       .then((html) => {
@@ -195,7 +194,153 @@
   }
 
   function findFriend() {
-    // TODO: write logic to find friend on map.
+    Backendless.UserService.getCurrentUser()
+      .then((currentUser) => {
+        if (!currentUser) {
+          showInfo("Please login first");
+          return Promise.reject("User is not logged in.");
+        }
+
+        console.log("CurrentUser: ", currentUser);
+
+        // Проверяем наличие геолокации текущего пользователя
+        if (
+          !currentUser["my location"] ||
+          !currentUser["my location"].x ||
+          !currentUser["my location"].y
+        ) {
+          showInfo("Please enable your geolocation first.");
+          return Promise.reject("User's location is not available.");
+        }
+
+        const myLocation = {
+          latitude: currentUser["my location"].y,
+          longitude: currentUser["my location"].x,
+        };
+
+        const friendName = document
+          .getElementById("friend-to-find")
+          .value.trim();
+        if (!friendName) {
+          showInfo("Please enter the friend's name.");
+          return Promise.reject("Friend name is not provided.");
+        }
+
+        console.log("Searching for friend:", friendName);
+
+        // Устанавливаем связанные данные для загрузки друзей
+        const queryBuilder = Backendless.DataQueryBuilder.create();
+        queryBuilder.setRelated(["friends"]);
+
+        // Загружаем текущего пользователя с друзьями
+        return Backendless.Data.of("Users")
+          .findById(currentUser.objectId, queryBuilder)
+          .then((userWithFriends) => {
+            const friends = userWithFriends.friends;
+
+            if (!friends || friends.length === 0) {
+              showInfo("You have no friends to search for.");
+              return Promise.reject("No friends found.");
+            }
+
+            console.log("Friends loaded:", friends);
+
+            // Находим друга по имени
+            const friend = friends.find((f) => f.name === friendName);
+
+            if (!friend) {
+              showInfo(
+                `Friend "${friendName}" not found in your friends list.`
+              );
+              return Promise.reject("Friend not found.");
+            }
+
+            console.log("Friend found:", friend);
+
+            // Проверяем наличие местоположения друга
+            if (
+              !friend["my location"] ||
+              !friend["my location"].x ||
+              !friend["my location"].y
+            ) {
+              showInfo(`Location tracking is disabled for "${friendName}".`);
+              return Promise.reject("Friend's location is not available.");
+            }
+
+            const friendLocation = {
+              latitude: friend["my location"].y,
+              longitude: friend["my location"].x,
+            };
+
+            const radius = parseFloat(document.getElementById("radius").value);
+            const distance = calculateDistance(
+              myLocation.latitude,
+              myLocation.longitude,
+              friendLocation.latitude,
+              friendLocation.longitude
+            );
+
+            if (distance > radius) {
+              showInfo(
+                `"${friendName}" is outside the ${radius}km radius from your location.`
+              );
+              return Promise.reject("Friend is outside the radius.");
+            }
+
+            console.log(`"${friendName}" is within ${radius}km radius.`);
+
+            // Отображаем друга на карте
+            const mapUrl = `https://www.google.com/maps?q=${friendLocation.latitude},${friendLocation.longitude}&z=12&output=embed`;
+
+            const mapContainer = document.getElementById("map-container");
+            const iframe = document.createElement("iframe");
+            iframe.src = mapUrl;
+            iframe.loading = "lazy";
+            iframe.allowFullscreen = true;
+
+            mapContainer.innerHTML = "";
+            mapContainer.appendChild(iframe);
+            mapContainer.style.display = "block";
+
+            const closeButton = document.createElement("button");
+            closeButton.textContent = "Close Map View";
+            closeButton.classList.add("red-btn");
+            closeButton.style.width = "auto";
+            closeButton.style.marginTop = "20px";
+
+            closeButton.addEventListener("click", () => {
+              mapContainer.innerHTML = "";
+              mapContainer.style.display = "none";
+            });
+
+            mapContainer.appendChild(closeButton);
+
+            showInfo(`"${friendName}"'s location is displayed on the map.`);
+          });
+      })
+      .catch((error) => {
+        console.error("Error in findFriend:", error);
+      });
+  }
+
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371;
+    var toRad = (value) => (value * Math.PI) / 180;
+
+    var dLat = toRad(lat2 - lat1);
+    var dLon = toRad(lon2 - lon1);
+
+    var a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(lat1)) *
+        Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    var distance = R * c;
+    return distance;
   }
 
   function logout() {

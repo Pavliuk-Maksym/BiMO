@@ -127,49 +127,6 @@
       .catch(onError);
   }
 
-  // function deleteFriend() {
-  //   Backendless.UserService.getCurrentUser().then((currentUser) => {
-  //     if (!currentUser) {
-  //       showInfo("Please login first");
-  //       return;
-  //     }
-
-  //     const currentUserobjectId = currentUser.objectId;
-  //     console.log("cur user obj id: ", currentUserobjectId);
-
-  //     const friendToDelete = [
-  //       document.getElementById("friend-to-delete").value,
-  //     ];
-
-  //     console.log("friend to delete: ", friendToDelete);
-
-  //     var whereClause = `name = '${friendToDelete[0]}'`;
-
-  //     Backendless.Data.of("Users").deleteRelation(
-  //       currentUserobjectId,
-  //       "friends",
-  //       whereClause
-  //     );
-
-  //     whereClause = `name = '${friendToDelete[0]}'`;
-
-  //     const queryBuilder = Backendless.DataQueryBuilder.create();
-  //     queryBuilder.addProperties("objectId");
-  //     queryBuilder.setWhereClause(whereClause);
-  //     Backendless.Data.of("Users")
-  //       .findFirst(queryBuilder)
-  //       .then((friendObjectId) => {
-  //         console.log("friden obj id: ", friendObjectId);
-  //         whereClause = `name = '${currentUser.name}'`;
-  //         Backendless.Data.of("Users").deleteRelation(
-  //           friendObjectId,
-  //           "friends",
-  //           whereClause
-  //         );
-  //       });
-  //   });
-  // }
-
   function showFriends() {
     Backendless.UserService.getCurrentUser()
       .then((currentUser) => {

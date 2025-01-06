@@ -14,7 +14,6 @@
   initEventHandlers();
 
   function initEventHandlers() {
-    // Добавляем обработчики событий для кнопок
     const addFriendButton = document.getElementById("add-friend-btn");
     const deleteFriendButton = document.getElementById("delete-friend-btn");
     const findFriendButton = document.getElementById("find-friend-btn");
@@ -78,6 +77,98 @@
         console.error(error);
       });
   }
+
+  function addFriend() {}
+
+  function deleteFriend() {
+    Backendless.UserService.getCurrentUser()
+      .then((currentUser) => {
+        if (!currentUser) {
+          showInfo("Please login first");
+          return Promise.reject("User is not logged in.");
+        }
+
+        const friendName = document
+          .getElementById("friend-to-delete")
+          .value.trim();
+        if (!friendName) {
+          showInfo("Please enter the friend's name.");
+          return Promise.reject("Friend name is not provided.");
+        }
+
+        const queryBuilder = Backendless.DataQueryBuilder.create();
+        queryBuilder.setWhereClause(`name = '${friendName}'`);
+        queryBuilder.addProperties("objectId", "name");
+
+        return Backendless.Data.of("Users")
+          .findFirst(queryBuilder)
+          .then((friend) => {
+            if (!friend) {
+              showInfo(`Friend "${friendName}" not found.`);
+              return Promise.reject("Friend not found.");
+            }
+
+            return Backendless.Data.of("Users")
+              .deleteRelation(currentUser.objectId, "friends", [
+                friend.objectId,
+              ])
+              .then(() => {
+                return Backendless.Data.of("Users").deleteRelation(
+                  friend.objectId,
+                  "friends",
+                  [currentUser.objectId]
+                );
+              })
+              .then(() => {
+                showInfo(`Friend "${friendName}" successfully removed.`);
+              });
+          });
+      })
+      .catch(onError);
+  }
+
+  // function deleteFriend() {
+  //   Backendless.UserService.getCurrentUser().then((currentUser) => {
+  //     if (!currentUser) {
+  //       showInfo("Please login first");
+  //       return;
+  //     }
+
+  //     const currentUserobjectId = currentUser.objectId;
+  //     console.log("cur user obj id: ", currentUserobjectId);
+
+  //     const friendToDelete = [
+  //       document.getElementById("friend-to-delete").value,
+  //     ];
+
+  //     console.log("friend to delete: ", friendToDelete);
+
+  //     var whereClause = `name = '${friendToDelete[0]}'`;
+
+  //     Backendless.Data.of("Users").deleteRelation(
+  //       currentUserobjectId,
+  //       "friends",
+  //       whereClause
+  //     );
+
+  //     whereClause = `name = '${friendToDelete[0]}'`;
+
+  //     const queryBuilder = Backendless.DataQueryBuilder.create();
+  //     queryBuilder.addProperties("objectId");
+  //     queryBuilder.setWhereClause(whereClause);
+  //     Backendless.Data.of("Users")
+  //       .findFirst(queryBuilder)
+  //       .then((friendObjectId) => {
+  //         console.log("friden obj id: ", friendObjectId);
+  //         whereClause = `name = '${currentUser.name}'`;
+  //         Backendless.Data.of("Users").deleteRelation(
+  //           friendObjectId,
+  //           "friends",
+  //           whereClause
+  //         );
+  //       });
+  //   });
+  // }
 
   function showFriends() {
     Backendless.UserService.getCurrentUser()
@@ -146,9 +237,9 @@
       .catch(onError);
   }
 
-  function deleteFriend() {}
-  function findFriend() {}
-  function addFriend() {}
+  function findFriend() {
+    // TODO: write logic to find friend on map.
+  }
 
   function logout() {
     Backendless.UserService.logout()

@@ -13,6 +13,28 @@
   initCurrentUser();
   initEventHandlers();
   initProfilePhotoHandlers();
+  initSubscriptions();
+
+  function initCurrentUser() {
+    Backendless.UserService.getCurrentUser()
+      .then((user) => {
+        if (!user) {
+          alert("Please login first");
+          return;
+        }
+
+        currentUser = user;
+
+        if (currentUser.profilePhoto) {
+          document.getElementById("profile-avatar").src =
+            currentUser.profilePhoto;
+        }
+      })
+      .catch((error) => {
+        alert("Error retrieving current user");
+        console.error(error);
+      });
+  }
 
   function initEventHandlers() {
     document.addEventListener("DOMContentLoaded", () => {
@@ -80,25 +102,35 @@
     saveAvatarBtn.addEventListener("click", saveSelectedPhoto);
   }
 
-  function initCurrentUser() {
-    Backendless.UserService.getCurrentUser()
-      .then((user) => {
-        if (!user) {
-          alert("Please login first");
-          return;
-        }
+  function initSubscriptions() {
+    Backendless.UserService.getCurrentUser().then((currentUser) => {
+      if (!currentUser) {
+        showInfo("Please login first.");
+        return;
+      }
+      console.log("user: ", currentUser);
 
-        currentUser = user;
+      // Подписка на уведомления
+      subscribeToNotifications(currentUser.objectId);
 
-        if (currentUser.profilePhoto) {
-          document.getElementById("profile-avatar").src =
-            currentUser.profilePhoto;
-        }
-      })
-      .catch((error) => {
-        alert("Error retrieving current user");
-        console.error(error);
-      });
+      // Подписка на обновления таблицы
+      subscribeToDatabaseUpdates();
+
+      var queryBuilder = Backendless.DataQueryBuilder.create();
+      queryBuilder.setRelated(["fromUser", "toUser"]);
+      queryBuilder.setWhereClause(`toUser = '${currentUser.objectId}'`);
+      queryBuilder.setRelationsDepth(1);
+
+      // Проверка таблицы на "pending" запросы
+      Backendless.Data.of("PendingFriendRequests")
+        .find(queryBuilder)
+        .then((pendingRequests) => {
+          // Обработать запросы
+          pendingRequests.forEach((request) => {
+            console.log("Pending friend request:", request.fromUser.name);
+          });
+        });
+    });
   }
 
   var trackingInterval;
@@ -320,6 +352,35 @@
       .catch((error) => {
         console.error("Error uploading photo:", error);
         showInfo("Error uploading photo: " + error.message);
+      });
+  }
+
+  // Подписка на уведомления через Messaging
+  function subscribeToNotifications(userId) {
+    const channelName = `friendRequests_${userId}`;
+    Backendless.Messaging.subscribe(channelName, function (message) {
+      console.log("New notification:", message);
+      // Добавить в UI
+      addNotificationToUI(message);
+    });
+  }
+
+  // Подписка на обновления таблицы через Real-Time Database
+  function subscribeToDatabaseUpdates() {
+    Backendless.Data.of("FriendRequests")
+      .rt()
+      .addUpdateListener(function (updatedObject) {
+        console.log("Database update:", updatedObject);
+        // Обновить список запросов
+        updateRequestsInUI(updatedObject);
+      });
+
+    Backendless.Data.of("FriendRequests")
+      .rt()
+      .addCreateListener(function (newObject) {
+        console.log("New database entry:", newObject);
+        // Добавить новый запрос в UI
+        addRequestToUI(newObject);
       });
   }
 

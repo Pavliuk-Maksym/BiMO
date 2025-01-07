@@ -12,6 +12,7 @@
 
   initCurrentUser();
   initEventHandlers();
+  showPendingRequests();
 
   function initEventHandlers() {
     const addFriendButton = document.getElementById("add-friend-btn");
@@ -77,7 +78,29 @@
       });
   }
 
-  function addFriend() {}
+  function addFriend() {
+    Backendless.UserService.getCurrentUser()
+      .then((currentUser) => {
+        if (!currentUser) {
+          showInfo("Please login first");
+          return Promise.reject("User is not logged in.");
+        }
+
+        const newRequest = {
+          fromUser: { objectId: currentUser.objectId }, // Устанавливаем связь с текущим пользователем
+          toUser: { objectId: toUserId }, // Устанавливаем связь с пользователем, которому отправляется заявка
+        };
+
+        return Backendless.Data.of("PendingFriendRequests").save(newRequest);
+      })
+      .then(() => {
+        showInfo("Friend request sent successfully.");
+      })
+      .catch((error) => {
+        console.error("Error sending friend request:", error);
+        showInfo("Failed to send friend request.");
+      });
+  }
 
   function deleteFriend() {
     Backendless.UserService.getCurrentUser()
@@ -192,6 +215,120 @@
       })
       .catch(onError);
   }
+
+  function showPendingRequests() {
+    Backendless.UserService.getCurrentUser().then((currentUser) => {
+      if (!currentUser) {
+        showInfo("Please login first.");
+        return;
+      }
+
+      console.log("user: ", currentUser);
+
+      const queryBuilder = Backendless.DataQueryBuilder.create();
+      queryBuilder.setRelated(["fromUser", "toUser"]);
+      queryBuilder.setWhereClause(
+        `toUser.objectId = '${currentUser.objectId}'`
+      );
+      queryBuilder.setRelationsDepth(1);
+
+      // Проверка таблицы на "pending" запросы
+      Backendless.Data.of("PendingFriendRequests")
+        .find(queryBuilder)
+        .then((pendingRequests) => {
+          const container = document.getElementById(
+            "pending-requests-container"
+          );
+          container.innerHTML = ""; // Очищаем контейнер перед добавлением новых заявок
+
+          if (pendingRequests.length === 0) {
+            container.innerHTML = "<p>No pending friend requests.</p>";
+            return;
+          }
+
+          pendingRequests.forEach((request, index) => {
+            const fromUser = request.fromUser;
+
+            // Создание карточки для каждого запроса
+            const requestCard = document.createElement("div");
+            requestCard.classList.add("pending-request-card");
+
+            const userPhoto = document.createElement("img");
+            userPhoto.src =
+              fromUser.photo || "../user-profile/placeholder-avatar.png"; // Используйте поле для фото пользователя или картинку по умолчанию
+            userPhoto.alt = `${fromUser.name}'s photo`;
+            userPhoto.classList.add("user-photo");
+
+            const userInfo = document.createElement("div");
+            userInfo.classList.add("user-info");
+
+            const userName = document.createElement("h3");
+            userName.textContent = fromUser.name;
+
+            const userEmail = document.createElement("p");
+            userEmail.textContent = fromUser.email;
+
+            const buttonsContainer = document.createElement("div");
+            buttonsContainer.classList.add("buttons-container");
+            buttonsContainer.style.display = "flex";
+            buttonsContainer.style.flexDirection = "row";
+
+            const acceptButton = document.createElement("button");
+            acceptButton.textContent = "Accept";
+            acceptButton.classList.add("accept-btn");
+
+            const declineButton = document.createElement("button");
+            declineButton.textContent = "Decline";
+            declineButton.classList.add("decline-btn");
+
+            const separator = document.createElement("hr");
+            separator.classList.add("card-separator");
+
+            buttonsContainer.appendChild(acceptButton);
+            buttonsContainer.appendChild(declineButton);
+
+            userInfo.appendChild(userName);
+            userInfo.appendChild(userEmail);
+            requestCard.appendChild(userPhoto);
+            requestCard.appendChild(userInfo);
+            requestCard.appendChild(buttonsContainer);
+            container.appendChild(separator);
+
+            container.appendChild(requestCard);
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching pending friend requests:", error);
+          showInfo("Failed to load pending friend requests.");
+        });
+    });
+  }
+
+  // function showPendingRequests() {
+  //   Backendless.UserService.getCurrentUser().then((currentUser) => {
+  //     if (!currentUser) {
+  //       showInfo("Please login first.");
+  //       return;
+  //     }
+
+  //     console.log("user: ", currentUser);
+
+  //     var queryBuilder = Backendless.DataQueryBuilder.create();
+  //     queryBuilder.setRelated(["fromUser", "toUser"]);
+  //     queryBuilder.setWhereClause(`toUser = '${currentUser.objectId}'`);
+  //     queryBuilder.setRelationsDepth(1);
+
+  //     // Проверка таблицы на "pending" запросы
+  //     Backendless.Data.of("PendingFriendRequests")
+  //       .find(queryBuilder)
+  //       .then((pendingRequests) => {
+  //         // Обработать запросы
+  //         pendingRequests.forEach((request) => {
+  //           console.log("Pending friend request from:", request.fromUser.name);
+  //         });
+  //       });
+  //   });
+  // }
 
   function findFriend() {
     Backendless.UserService.getCurrentUser()

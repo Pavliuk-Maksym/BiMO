@@ -34,13 +34,6 @@
     );
   }
 
-  function loginError(logger, username, password) {
-    showInfo("Login failed");
-    Backendless.Logging.getLogger(logger).error(
-      `Login failed Entered username: '${username}' Entered password: '${password}'`
-    );
-  }
-
   function onError(error) {
     console.error("An error occurred:", error);
     showInfo(error.message || "An error occurred");

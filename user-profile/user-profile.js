@@ -114,7 +114,7 @@
       subscribeToNotifications(currentUser.objectId);
 
       // Подписка на обновления таблицы
-      subscribeToDatabaseUpdates();
+      // subscribeToDatabaseUpdates();
 
       var queryBuilder = Backendless.DataQueryBuilder.create();
       queryBuilder.setRelated(["fromUser", "toUser"]);
@@ -125,6 +125,7 @@
       Backendless.Data.of("PendingFriendRequests")
         .find(queryBuilder)
         .then((pendingRequests) => {
+          showInfo("You have new friend requests!");
           // Обработать запросы
           pendingRequests.forEach((request) => {
             console.log("Pending friend request:", request.fromUser.name);
@@ -360,8 +361,6 @@
     const channelName = `friendRequests_${userId}`;
     Backendless.Messaging.subscribe(channelName, function (message) {
       console.log("New notification:", message);
-      // Добавить в UI
-      addNotificationToUI(message);
     });
   }
 
@@ -371,16 +370,12 @@
       .rt()
       .addUpdateListener(function (updatedObject) {
         console.log("Database update:", updatedObject);
-        // Обновить список запросов
-        updateRequestsInUI(updatedObject);
       });
 
     Backendless.Data.of("FriendRequests")
       .rt()
       .addCreateListener(function (newObject) {
         console.log("New database entry:", newObject);
-        // Добавить новый запрос в UI
-        addRequestToUI(newObject);
       });
   }
 

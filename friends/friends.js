@@ -79,27 +79,56 @@
   }
 
   function addFriend() {
-    Backendless.UserService.getCurrentUser()
-      .then((currentUser) => {
-        if (!currentUser) {
-          showInfo("Please login first");
-          return Promise.reject("User is not logged in.");
-        }
+    Backendless.UserService.getCurrentUser().then((currentUser) => {
+      if (!currentUser) {
+        showInfo("Please login first");
+        return Promise.reject("User is not logged in.");
+      }
 
-        const newRequest = {
-          fromUser: { objectId: currentUser.objectId }, // Устанавливаем связь с текущим пользователем
-          toUser: { objectId: toUserId }, // Устанавливаем связь с пользователем, которому отправляется заявка
-        };
+      const friendNameToAdd = document.getElementById("friend-to-add").value;
+      const queryBuilder = Backendless.DataQueryBuilder.create();
+      queryBuilder.setWhereClause(`name = '${friendNameToAdd}'`);
 
-        return Backendless.Data.of("PendingFriendRequests").save(newRequest);
-      })
-      .then(() => {
-        showInfo("Friend request sent successfully.");
-      })
-      .catch((error) => {
-        console.error("Error sending friend request:", error);
-        showInfo("Failed to send friend request.");
-      });
+      return Backendless.Data.of("Users")
+        .findFirst(queryBuilder)
+        .then((friend) => {
+          if (!friend) {
+            showInfo(`User with name "${friendNameToAdd}" not found.`);
+            return Promise.reject("User not found.");
+          }
+
+          const pendingRequest = {
+            fromUser: currentUser.objectId,
+            toUser: friend.objectId,
+          };
+
+          return Backendless.Data.of("PendingFriendRequests")
+            .save(pendingRequest)
+            .then((savedRequest) => {
+              console.log("Pending friend request saved:", savedRequest);
+
+              Backendless.Data.of("PendingFriendRequests").setRelation(
+                savedRequest.objectId,
+                "fromUser",
+                [currentUser.objectId]
+              );
+              Backendless.Data.of("PendingFriendRequests").setRelation(
+                savedRequest.objectId,
+                "toUser",
+                [friend.objectId]
+              );
+
+              showInfo("Friend request sent!");
+            })
+            .catch((error) => {
+              console.error("Error saving friend request:", error);
+              showInfo("Failed to send friend request.");
+            });
+        })
+        .catch((error) => {
+          console.error("Error finding user:", error);
+        });
+    });
   }
 
   function deleteFriend() {

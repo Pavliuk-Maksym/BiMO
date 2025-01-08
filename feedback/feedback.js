@@ -12,6 +12,7 @@
 
   initCurrentUser();
   initEventHandlers();
+  initSubscriptions();
 
   function initEventHandlers() {
     document.addEventListener("DOMContentLoaded", () => {
@@ -84,15 +85,71 @@
     showInfo("Your Feedback has been successfully send!");
   }
 
+  function initSubscriptions() {
+    Backendless.UserService.getCurrentUser().then((currentUser) => {
+      if (!currentUser) {
+        showInfo("Please login first.");
+        return;
+      }
+      console.log("user: ", currentUser);
+
+      subscribeToNotifications(currentUser.objectId);
+
+      var queryBuilder = Backendless.DataQueryBuilder.create();
+      queryBuilder.setRelated(["fromUser", "toUser"]);
+      queryBuilder.setWhereClause(`toUser = '${currentUser.objectId}'`);
+      queryBuilder.setRelationsDepth(1);
+
+      Backendless.Data.of("PendingFriendRequests")
+        .find(queryBuilder)
+        .then((pendingRequests) => {
+          pendingRequests.forEach((request) => {
+            console.log("Pending friend request:", request.fromUser.name);
+          });
+        });
+    });
+  }
+
+  let channel;
+  let messageListener;
+
+  function subscribeToNotifications(currentUserName) {
+    channel = Backendless.Messaging.subscribe("friendRequests");
+
+    const selector = `name = '${currentUserName}'`;
+
+    messageListener = (message) => {
+      if (message.headers.name === currentUserName) {
+        console.log("New friend request notification:", message);
+        showInfo("You have new friend requests!");
+      }
+    };
+
+    channel.addMessageListener(selector, messageListener);
+
+    console.log(`Subscribed to notifications for: ${currentUserName}`);
+  }
+
   function logout() {
-    Backendless.UserService.logout()
-      .then(() => {
-        showInfo("User logged out successfully");
-        currentUser = null;
-        window.location.href =
-          "../authentication/authorization/authorization.html";
-      })
-      .catch(onError);
+    Backendless.UserService.getCurrentUser().then((currentUser) => {
+      if (!channel || !messageListener) {
+        console.error("Channel or messageListener is not initialized");
+        return;
+      }
+
+      var selector = `name = '${currentUser.name}'`;
+
+      channel.removeMessageListener(selector, messageListener);
+      console.log(`Unsubscribed from notifications for: ${currentUser.name}`);
+
+      Backendless.UserService.logout()
+        .then(() => {
+          showInfo("User logged out successfully");
+          window.location.href =
+            "../authentication/authorization/authorization.html";
+        })
+        .catch(onError);
+    });
   }
 
   function onError(error) {

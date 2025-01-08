@@ -354,37 +354,19 @@
 
   function subscribeToNotifications(currentUserName) {
     channel = Backendless.Messaging.subscribe("friendRequests");
-    var selector = `name = '${currentUserName}'`;
+
+    const selector = `name = '${currentUserName}'`;
 
     messageListener = (message) => {
-      console.log("New friend request notification:", message);
-      showInfo(message);
+      if (message.headers.name === currentUserName) {
+        console.log("New friend request notification:", message);
+        showInfo("You have new friend requests!");
+      }
     };
 
-    channel.addMessageListener(selector, () => {
-      onMessage(messageListener);
-    });
+    channel.addMessageListener(selector, messageListener);
 
     console.log(`Subscribed to notifications for: ${currentUserName}`);
-  }
-
-  function onMessage(stringMessage) {
-    console.log("Message received: " + stringMessage.data);
-    showInfo("Message received: " + stringMessage.data);
-  }
-
-  function subscribeToDatabaseUpdates() {
-    Backendless.Data.of("FriendRequests")
-      .rt()
-      .addUpdateListener(function (updatedObject) {
-        console.log("Database update:", updatedObject);
-      });
-
-    Backendless.Data.of("FriendRequests")
-      .rt()
-      .addCreateListener(function (newObject) {
-        console.log("New database entry:", newObject);
-      });
   }
 
   function logout() {

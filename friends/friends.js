@@ -137,17 +137,23 @@
 
   function publishNotification(userNameToSendRequest) {
     const channel = "friendRequests";
-    const message = `You have a new friend request!`;
+    const message = "You have a new friend request!";
+    console.log("user name to send reqtuest: ", userNameToSendRequest);
+
+    // Опции публикации с указанием хедеров
     const pubOps = new Backendless.PublishOptions({
       headers: {
         name: userNameToSendRequest,
       },
     });
 
+    console.log("pub ops: ", pubOps);
+
+    // Публикация сообщения
     Backendless.Messaging.publish(channel, message, pubOps)
       .then(() => {
         console.log(
-          "Notification published successfully to: ",
+          "Notification published successfully to:",
           userNameToSendRequest
         );
       })
@@ -155,6 +161,27 @@
         console.error("Error publishing notification:", error);
       });
   }
+
+  // function publishNotification(userNameToSendRequest) {
+  //   const channel = "friendRequests";
+  //   const message = `You have a new friend request!`;
+  //   const pubOps = new Backendless.PublishOptions({
+  //     headers: {
+  //       name: `${userNameToSendRequest}`,
+  //     },
+  //   });
+
+  //   Backendless.Messaging.publish(channel, message, pubOps)
+  //     .then(() => {
+  //       console.log(
+  //         "Notification published successfully to: ",
+  //         userNameToSendRequest
+  //       );
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error publishing notification:", error);
+  //     });
+  // }
 
   function deleteFriend() {
     Backendless.UserService.getCurrentUser()

@@ -43,7 +43,7 @@
         .then((html) => {
           document.getElementById("footer").innerHTML = html;
 
-          const logoutButton = document
+          var logoutButton = document
             .getElementById("footer")
             ?.querySelector(".footer-nav #logout-btn");
 
@@ -110,23 +110,16 @@
       }
       console.log("user: ", currentUser);
 
-      // Подписка на уведомления
       subscribeToNotifications(currentUser.objectId);
-
-      // Подписка на обновления таблицы
-      // subscribeToDatabaseUpdates();
 
       var queryBuilder = Backendless.DataQueryBuilder.create();
       queryBuilder.setRelated(["fromUser", "toUser"]);
       queryBuilder.setWhereClause(`toUser = '${currentUser.objectId}'`);
       queryBuilder.setRelationsDepth(1);
 
-      // Проверка таблицы на "pending" запросы
       Backendless.Data.of("PendingFriendRequests")
         .find(queryBuilder)
         .then((pendingRequests) => {
-          showInfo("You have new friend requests!");
-          // Обработать запросы
           pendingRequests.forEach((request) => {
             console.log("Pending friend request:", request.fromUser.name);
           });
@@ -356,15 +349,30 @@
       });
   }
 
-  // Подписка на уведомления через Messaging
-  function subscribeToNotifications(userId) {
-    const channelName = `friendRequests_${userId}`;
-    Backendless.Messaging.subscribe(channelName, function (message) {
-      console.log("New notification:", message);
+  let channel;
+  let messageListener;
+
+  function subscribeToNotifications(currentUserName) {
+    channel = Backendless.Messaging.subscribe("friendRequests");
+    var selector = `name = '${currentUserName}'`;
+
+    messageListener = (message) => {
+      console.log("New friend request notification:", message);
+      showInfo(message);
+    };
+
+    channel.addMessageListener(selector, () => {
+      onMessage(messageListener);
     });
+
+    console.log(`Subscribed to notifications for: ${currentUserName}`);
   }
 
-  // Подписка на обновления таблицы через Real-Time Database
+  function onMessage(stringMessage) {
+    console.log("Message received: " + stringMessage.data);
+    showInfo("Message received: " + stringMessage.data);
+  }
+
   function subscribeToDatabaseUpdates() {
     Backendless.Data.of("FriendRequests")
       .rt()
@@ -380,14 +388,25 @@
   }
 
   function logout() {
-    Backendless.UserService.logout()
-      .then(() => {
-        showInfo("User logged out successfully");
-        currentUser = null;
-        window.location.href =
-          "../authentication/authorization/authorization.html";
-      })
-      .catch(onError);
+    Backendless.UserService.getCurrentUser().then((currentUser) => {
+      if (!channel || !messageListener) {
+        console.error("Channel or messageListener is not initialized");
+        return;
+      }
+
+      var selector = `name = '${currentUser.name}'`;
+
+      channel.removeMessageListener(selector, messageListener);
+      console.log(`Unsubscribed from notifications for: ${currentUser.name}`);
+
+      Backendless.UserService.logout()
+        .then(() => {
+          showInfo("User logged out successfully");
+          window.location.href =
+            "../authentication/authorization/authorization.html";
+        })
+        .catch(onError);
+    });
   }
 
   function onError(error) {

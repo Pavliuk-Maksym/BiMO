@@ -16,8 +16,8 @@
     showInfo("Logging in...");
 
     Backendless.UserService.login(login.name, login.password, true)
-      .then((user) => {
-        if (user) {
+      .then((currentUser) => {
+        if (currentUser) {
           showInfo("Login successful");
           window.location.href = "../../user-profile/user-profile.html";
         }

@@ -21,7 +21,7 @@
     const showFriendsButton = document.getElementById("show-friends-btn");
 
     if (addFriendButton) {
-      addFriendButton.addEventListener("click", addFriend);
+      addFriendButton.addEventListener("click", sendFriendRequest);
     } else {
       console.error("Add Friend button not found");
     }
@@ -78,28 +78,29 @@
       });
   }
 
-  function addFriend() {
+  function sendFriendRequest() {
     Backendless.UserService.getCurrentUser().then((currentUser) => {
       if (!currentUser) {
         showInfo("Please login first");
         return Promise.reject("User is not logged in.");
       }
 
-      const friendNameToAdd = document.getElementById("friend-to-add").value;
+      const userNameToSendRequest =
+        document.getElementById("friend-to-add").value;
       const queryBuilder = Backendless.DataQueryBuilder.create();
-      queryBuilder.setWhereClause(`name = '${friendNameToAdd}'`);
+      queryBuilder.setWhereClause(`name = '${userNameToSendRequest}'`);
 
       return Backendless.Data.of("Users")
         .findFirst(queryBuilder)
-        .then((friend) => {
-          if (!friend) {
-            showInfo(`User with name "${friendNameToAdd}" not found.`);
+        .then((userToSendRequest) => {
+          if (!userToSendRequest) {
+            showInfo(`User with name "${userNameToSendRequest}" not found.`);
             return Promise.reject("User not found.");
           }
 
           const pendingRequest = {
             fromUser: currentUser.objectId,
-            toUser: friend.objectId,
+            toUser: userToSendRequest.objectId,
           };
 
           return Backendless.Data.of("PendingFriendRequests")
@@ -115,11 +116,13 @@
               Backendless.Data.of("PendingFriendRequests").setRelation(
                 savedRequest.objectId,
                 "toUser",
-                [friend.objectId]
+                [userToSendRequest.objectId]
               );
 
+              publishNotification(userNameToSendRequest);
               showInfo("Friend request sent!");
             })
+            .then({})
             .catch((error) => {
               console.error("Error saving friend request:", error);
               showInfo("Failed to send friend request.");
@@ -129,6 +132,27 @@
           console.error("Error finding user:", error);
         });
     });
+  }
+
+  function publishNotification(userNameToSendRequest) {
+    const channel = "friendRequests";
+    const message = `You have a new friend request!`;
+    const pubOps = new Backendless.PublishOptions({
+      headers: {
+        name: userNameToSendRequest,
+      },
+    });
+
+    Backendless.Messaging.publish(channel, message, pubOps)
+      .then(() => {
+        console.log(
+          "Notification published successfully to: ",
+          userNameToSendRequest
+        );
+      })
+      .catch((error) => {
+        console.error("Error publishing notification:", error);
+      });
   }
 
   function deleteFriend() {
@@ -261,30 +285,28 @@
       );
       queryBuilder.setRelationsDepth(1);
 
-      // Проверка таблицы на "pending" запросы
       Backendless.Data.of("PendingFriendRequests")
         .find(queryBuilder)
         .then((pendingRequests) => {
           const container = document.getElementById(
             "pending-requests-container"
           );
-          container.innerHTML = ""; // Очищаем контейнер перед добавлением новых заявок
+          container.innerHTML = "";
 
           if (pendingRequests.length === 0) {
             container.innerHTML = "<p>No pending friend requests.</p>";
             return;
           }
 
-          pendingRequests.forEach((request, index) => {
+          pendingRequests.forEach((request) => {
             const fromUser = request.fromUser;
 
-            // Создание карточки для каждого запроса
             const requestCard = document.createElement("div");
             requestCard.classList.add("pending-request-card");
 
             const userPhoto = document.createElement("img");
             userPhoto.src =
-              fromUser.photo || "../user-profile/placeholder-avatar.png"; // Используйте поле для фото пользователя или картинку по умолчанию
+              fromUser.photo || "../user-profile/placeholder-avatar.png";
             userPhoto.alt = `${fromUser.name}'s photo`;
             userPhoto.classList.add("user-photo");
 
@@ -322,8 +344,14 @@
             requestCard.appendChild(userInfo);
             requestCard.appendChild(buttonsContainer);
             container.appendChild(separator);
-
             container.appendChild(requestCard);
+
+            acceptButton.addEventListener("click", () =>
+              handleRequest(currentUser, fromUser, true)
+            );
+            declineButton.addEventListener("click", () =>
+              handleRequest(currentUser, fromUser, false)
+            );
           });
         })
         .catch((error) => {
@@ -333,31 +361,48 @@
     });
   }
 
-  // function showPendingRequests() {
-  //   Backendless.UserService.getCurrentUser().then((currentUser) => {
-  //     if (!currentUser) {
-  //       showInfo("Please login first.");
-  //       return;
-  //     }
+  function handleRequest(currentUser, fromUser, isAccepted) {
+    if (isAccepted) {
+      Backendless.Data.of("Users")
+        .addRelation(currentUser.objectId, "friends", [fromUser.objectId])
+        .then(() => {
+          showInfo(`${fromUser.name} has been added to your friends list.`);
+          removePendingRequest(fromUser);
+        })
+        .catch((error) => {
+          console.error("Error accepting friend request:", error);
+          showInfo("Failed to accept friend request.");
+        });
+    } else {
+      removePendingRequest(fromUser).then(() => {
+        showInfo(`Friend request from ${fromUser.name} has been declined.`);
+      });
+    }
+  }
 
-  //     console.log("user: ", currentUser);
+  function removePendingRequest(fromUser) {
+    const queryBuilder = Backendless.DataQueryBuilder.create();
+    queryBuilder.setWhereClause(`fromUser.objectId = '${fromUser.objectId}'`);
 
-  //     var queryBuilder = Backendless.DataQueryBuilder.create();
-  //     queryBuilder.setRelated(["fromUser", "toUser"]);
-  //     queryBuilder.setWhereClause(`toUser = '${currentUser.objectId}'`);
-  //     queryBuilder.setRelationsDepth(1);
+    return Backendless.Data.of("PendingFriendRequests")
+      .findFirst(queryBuilder)
+      .then((pendingRequest) => {
+        if (!pendingRequest || !pendingRequest.objectId) {
+          throw new Error("Pending request not found or objectId is missing.");
+        }
 
-  //     // Проверка таблицы на "pending" запросы
-  //     Backendless.Data.of("PendingFriendRequests")
-  //       .find(queryBuilder)
-  //       .then((pendingRequests) => {
-  //         // Обработать запросы
-  //         pendingRequests.forEach((request) => {
-  //           console.log("Pending friend request from:", request.fromUser.name);
-  //         });
-  //       });
-  //   });
-  // }
+        return Backendless.Data.of("PendingFriendRequests").remove(
+          pendingRequest.objectId
+        );
+      })
+      .then(() => {
+        console.log("Pending request removed for user:", fromUser.name);
+        showPendingRequests();
+      })
+      .catch((error) => {
+        console.error("Error removing pending request:", error);
+      });
+  }
 
   function findFriend() {
     Backendless.UserService.getCurrentUser()
@@ -369,7 +414,6 @@
 
         console.log("CurrentUser: ", currentUser);
 
-        // Проверяем наличие геолокации текущего пользователя
         if (
           !currentUser["my location"] ||
           !currentUser["my location"].x ||
@@ -394,11 +438,9 @@
 
         console.log("Searching for friend:", friendName);
 
-        // Устанавливаем связанные данные для загрузки друзей
         const queryBuilder = Backendless.DataQueryBuilder.create();
         queryBuilder.setRelated(["friends"]);
 
-        // Загружаем текущего пользователя с друзьями
         return Backendless.Data.of("Users")
           .findById(currentUser.objectId, queryBuilder)
           .then((userWithFriends) => {
@@ -411,7 +453,6 @@
 
             console.log("Friends loaded:", friends);
 
-            // Находим друга по имени
             const friend = friends.find((f) => f.name === friendName);
 
             if (!friend) {
@@ -423,7 +464,6 @@
 
             console.log("Friend found:", friend);
 
-            // Проверяем наличие местоположения друга
             if (
               !friend["my location"] ||
               !friend["my location"].x ||
@@ -455,7 +495,6 @@
 
             console.log(`"${friendName}" is within ${radius}km radius.`);
 
-            // Отображаем друга на карте
             const mapUrl = `https://www.google.com/maps?q=${friendLocation.latitude},${friendLocation.longitude}&z=12&output=embed`;
 
             const mapContainer = document.getElementById("map-container");

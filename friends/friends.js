@@ -393,6 +393,13 @@
     if (isAccepted) {
       Backendless.Data.of("Users")
         .addRelation(currentUser.objectId, "friends", [fromUser.objectId])
+        .catch((error) => {
+          console.error("Error accepting friend request:", error);
+          showInfo("Failed to accept friend request.");
+        });
+
+      Backendless.Data.of("Users")
+        .addRelation(fromUser.objectId, "friends", [currentUser.objectId])
         .then(() => {
           showInfo(`${fromUser.name} has been added to your friends list.`);
           removePendingRequest(fromUser);

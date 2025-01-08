@@ -349,8 +349,8 @@
       });
   }
 
-  var messageListener;
-  var channel;
+  let messageListener;
+  let channel;
 
   function subscribeToNotifications(currentUserName) {
     channel = Backendless.Messaging.subscribe("friendRequests");

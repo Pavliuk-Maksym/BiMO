@@ -349,18 +349,22 @@
       });
   }
 
-  let messageListener;
   let channel;
+  let messageListener;
 
   function subscribeToNotifications(currentUserName) {
     channel = Backendless.Messaging.subscribe("friendRequests");
 
     const selector = `name = '${currentUserName}'`;
 
-    channel.addMessageListener(selector, (message) => {
-      console.log("New friend request notification:", message);
-      showInfo("You have new friend requests!");
-    });
+    messageListener = (message) => {
+      if (message.headers.name === currentUserName) {
+        console.log("New friend request notification:", message);
+        showInfo("You have new friend requests!");
+      }
+    };
+
+    channel.addMessageListener(selector, messageListener);
 
     console.log(`Subscribed to notifications for: ${currentUserName}`);
   }

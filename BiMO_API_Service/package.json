@@ -1,0 +1,12 @@
+{
+  "name": "BiMO-servercode",
+  "version": "1.0.0",
+  "scripts": {
+    "debug": "coderunner debug",
+    "deploy": "coderunner deploy"
+  },
+  "devDependencies": {
+    "backendless-coderunner": "^7.4.22"
+  },
+  "license": "MIT"
+}
